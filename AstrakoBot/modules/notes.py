@@ -9,12 +9,12 @@ from telegram.ext import CommandHandler, RegexHandler
 from telegram.ext.dispatcher import run_async
 from telegram.utils.helpers import escape_markdown
 
-import AstrakoBot.modules.sql.notes_sql as sql
-from AstrakoBot import dispatcher, MESSAGE_DUMP, LOGGER, SUPPORT_CHAT
-from AstrakoBot.modules.disable import DisableAbleCommandHandler
-from AstrakoBot.modules.helper_funcs.chat_status import user_admin
-from AstrakoBot.modules.helper_funcs.misc import build_keyboard, revert_buttons
-from AstrakoBot.modules.helper_funcs.msg_types import get_note_type
+import bot.modules.sql.notes_sql as sql
+from bot import dispatcher, MESSAGE_DUMP, LOGGER
+from bot.modules.disable import DisableAbleCommandHandler
+from bot.modules.helper_funcs.chat_status import user_admin
+from bot.modules.helper_funcs.misc import build_keyboard, revert_buttons
+from bot.modules.helper_funcs.msg_types import get_note_type
 
 FILE_MATCHER = re.compile(r"^###file_id(!photo)?###:(.*?)(?:\s|$)")
 
@@ -100,8 +100,7 @@ def get(bot, update, notename, show_none=True, no_format=False):
                                        "the meantime, I'll remove it from your notes list.")
                     sql.rm_note(chat_id, notename)
                 else:
-                    message.reply_text("This note could not be sent, as it is incorrectly formatted. Ask in "
-                                       f"{SUPPORT_CHAT} if you can't figure out why!")
+                    message.reply_text("This note could not be sent, as it is incorrectly formatted.")
                     LOGGER.exception("Could not parse message #%s in chat %s", notename, str(chat_id))
                     LOGGER.warning("Message was: %s", str(note.value))
         return
@@ -177,12 +176,12 @@ def list_notes(bot: Bot, update: Update):
 
     msg = "*Notes in chat:*\n"
     for note in note_list:
-        note_name = f"• `#{escape_markdown(note.name.lower())}`\n"
+        note_name = f" • `#{escape_markdown(note.name.lower())}`\n"
         if len(msg) + len(note_name) > MAX_MESSAGE_LENGTH:
             update.effective_message.reply_text(msg, parse_mode=ParseMode.MARKDOWN)
             msg = ""
         msg += note_name
-       
+
     if msg == "*Notes in chat:*\n":
         update.effective_message.reply_text("No notes in this chat!")
 
