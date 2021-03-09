@@ -1,4 +1,4 @@
-from AstrakoBot.modules.helper_funcs.chat_status import sudo_plus
+from AstrakoBot.modules.helper_funcs.chat_status import user_admin
 from AstrakoBot.modules.disable import DisableAbleCommandHandler
 from AstrakoBot import dispatcher
 
@@ -33,7 +33,7 @@ Keep in mind that your message <b>MUST</b> contain some text other than just a b
 
 
 @run_async
-@sudo_plus
+@user_admin
 def echo(update: Update, context: CallbackContext):
     args = update.effective_message.text.split(None, 1)
     message = update.effective_message
