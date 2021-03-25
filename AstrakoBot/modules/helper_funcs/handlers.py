@@ -3,7 +3,7 @@ from AstrakoBot import ALLOW_EXCL
 from AstrakoBot import DEV_USERS, DRAGONS, DEMONS, WOLVES
 
 from telegram import Update
-from telegram.ext import CommandHandler, MessageHandler, RegexHandler, Filters
+from telegram.ext import CommandHandler, MessageHandler, Filters
 from pyrate_limiter import (
     BucketFullException,
     Duration,
@@ -117,9 +117,9 @@ class CustomCommandHandler(CommandHandler):
                 context.update(check_result[1])
 
 
-class CustomRegexHandler(RegexHandler):
+class CustomRegexHandler(MessageHandler):
     def __init__(self, pattern, callback, friendly="", **kwargs):
-        super().__init__(pattern, callback, **kwargs)
+        super().__init__(Filters.regex(pattern), callback, **kwargs)
 
 
 class CustomMessageHandler(MessageHandler):
