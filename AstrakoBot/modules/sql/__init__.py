@@ -2,7 +2,6 @@ from AstrakoBot import DB_URI
 from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import scoped_session, sessionmaker
-from sqlalchemy.dialects import postgres
 
 def start() -> scoped_session:
     engine = create_engine(DB_URI, client_encoding="utf8")
