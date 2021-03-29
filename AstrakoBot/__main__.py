@@ -73,10 +73,17 @@ def get_readable_time(seconds: int) -> str:
 
 
 PM_START_TEXT = """
-Hi {}, my name is {}! 
-I am a modular group management bot.
+Hi *{}*, my name is *{}*!
+ ━━━━━━━━━━━━━━━━━━━━━━━
+I Am A Bot That Can Help You
+Managing Groups to be Safe and Fun,
 
-You can find my list of available commands with /help.
+Use Command /help to find out my features
+
+*Managed By* : [Ihsan•イサン](t.me/RxyMX)
+ ━━━━━━━━━━━━━━━━━━━━━━━
+
+Want to add me to your group? Just click the button below!
 """
 
 HELP_STRINGS = """
@@ -98,12 +105,12 @@ And the following:
     "" if not ALLOW_EXCL else "\nAll commands can either be used with / or !.\n",
 )
 
-ASTRAKOBOT_IMG = "https://i.imgur.com/1oah5E2.jpg"
+ASTRAKOBOT_IMG = "https://telegra.ph/file/0031a7eadab404ec555e4.mp4"
 
 DONATE_STRING = """Heya, glad to hear you want to donate!
 AstrakoBot is hosted on its own server and doesn't require any donations as of now but \
 You can donate to the original writer of the Base code, Paul
-There are two ways of supporting him; [PayPal](paypal.me/PaulSonOfLars), or [Monzo](monzo.me/paulnionvestergaardlarsen)."""
+There are two ways of supporting him; [Trakteer](trakteer.id/Scroxy), or [Ihsan•イサン](t.me/RxyMX)."""
 
 IMPORTED = {}
 MIGRATEABLE = []
@@ -217,7 +224,7 @@ def start(update: Update, context: CallbackContext):
                     [
                         [
                             InlineKeyboardButton(
-                                text="Add AstrakoBot to your group",
+                                text=" 🌟 Add Me To Your Group 🌟",
                                 url="t.me/{}?startgroup=true".format(
                                     context.bot.username
                                 ),
@@ -225,20 +232,20 @@ def start(update: Update, context: CallbackContext):
                         ],
                         [
                             InlineKeyboardButton(
-                                text="Support Group",
-                                url=f"https://t.me/AstrakoBotSupport",
+                                text=" Anime Group Indo ",
+                                url=f"https://t.me/animegrupindo",
                             ),
                         ],
                         [
                             InlineKeyboardButton(
-                                text="Getting started guide",
-                                url="https://t.me/OnePunchUpdates/29",
+                                text=" Anime Channel Indo ",
+                                url="https://t.me/animechanelindo",
                             )
                         ],
                         [
                             InlineKeyboardButton(
-                                text="Source code",
-                                url="https://github.com/Astrako/AstrakoBot",
+                                text=" 🚫 GBAN LOGS ",
+                                url="https://t.me/gbanlogs_bot",
                             )
                         ],
                     ]
