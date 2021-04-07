@@ -421,69 +421,69 @@ Commands listed here only work for users with special access and are mainly used
 Group admins/group owners do not need these commands. 
 
 *List all special users:*
-• `/sudolist`*:* Lists all users which have sudo access to the bot
-• `/supportlist`*:* Lists all users which are allowed to gban, but can also be banned
-• `/whitelistlist`*:* Lists all users which cannot be banned, muted flood or kicked but can be manually banned by admins
-• `/devlist`*:* Lists all developer users who will have the same perms as the owner
-• `/addsudo`*:* Adds a user as sudo
-• `/addsupport`*:* Adds a user as support
-• `/addwhitelist`*:* Adds a user as whitelist
+• `/sudolist`: Lists all users which have sudo access to the bot
+• `/supportlist`: Lists all users which are allowed to gban, but can also be banned
+• `/whitelistlist`: Lists all users which cannot be banned, muted flood or kicked but can be manually banned by admins
+• `/devlist`: Lists all developer users who will have the same perms as the owner
+• `/addsudo`: Adds a user as sudo
+• `/addsupport`: Adds a user as support
+• `/addwhitelist`: Adds a user as whitelist
 • `Add dev doesnt exist, devs should know how to add themselves`
 
 *Broadcast: (Bot owner only)*
 • *Note:* This supports basic markdown
-• `/broadcastall`*:* Broadcasts everywhere
-• `/broadcastusers`*:* Broadcasts too all users
-• `/broadcastgroups`*:* Broadcasts too all groups
+• `/broadcastall`: Broadcasts everywhere
+• `/broadcastusers`: Broadcasts too all users
+• `/broadcastgroups`: Broadcasts too all groups
 
 *Groups Info:*
-• `/groups`*:* List the groups with Name, ID, members count as a txt
-• `/chatlist`*:* same as groups
-• `/leave <ID>`*:* Leave the group, ID must have hyphen
-• `/stats`*:* Shows overall bot stats
-• `/getchats`*:* Gets a list of group names the user has been seen in. Bot owner only
-• `/ginfo username/link/ID`*:* Pulls info panel for entire group
+• `/groups`: List the groups with Name, ID, members count as a txt
+• `/chatlist`: same as groups
+• `/leave <ID>`: Leave the group, ID must have hyphen
+• `/stats`: Shows overall bot stats
+• `/getchats`: Gets a list of group names the user has been seen in. Bot owner only
+• `/ginfo username/link/ID`: Pulls info panel for entire group
 
 *Access control:* 
-• `/ignore`*:* Blacklists a user from using the bot entirely
-• `/notice`*:* Removes user from blacklist
-• `/ignoredlist`*:* Lists ignored users
+• `/ignore`: Blacklists a user from using the bot entirely
+• `/notice`: Removes user from blacklist
+• `/ignoredlist`: Lists ignored users
 
 *Sys tools:* 
-• `/ip`*:* gets bot connection ip (bot owner only)
-• `/ping`*:* gets ping time of bot to telegram server
-• `/speedtest`*:* runs a speedtest and gives you 2 options to choose from, text or image output
-• `/status`*:* gets some system info
+• `/ip`: gets bot connection ip (bot owner only)
+• `/ping`: gets ping time of bot to telegram server
+• `/speedtest`: runs a speedtest and gives you 2 options to choose from, text or image output
+• `/status`: gets some system info
 
 *Global Bans:*
-• `/gban <id> <reason>`*:* Gbans the user, works by reply too
-• `/ungban`*:* Ungbans the user, same usage as gban
-• `/gbanlist`*:* Outputs a list of gbanned users
+• `/gban <id> <reason>`: Gbans the user, works by reply too
+• `/ungban`: Ungbans the user, same usage as gban
+• `/gbanlist`: Outputs a list of gbanned users
 
 *Module loading:*
-• `/listmodules`*:* Prints modules and their names
-• `/unload <name>`*:* Unloads module dynamically
-• `/load <name>`*:* Loads module
+• `/listmodules`: Prints modules and their names
+• `/unload <name>`: Unloads module dynamically
+• `/load <name>`: Loads module
 
 *Remote commands:*
-• `/rban user group`*:* Remote ban
-• `/runban user group`*:* Remote un-ban
-• `/rpunch user group`*:* Remote punch
-• `/rmute user group`*:* Remote mute
-• `/runmute user group`*:* Remote un-mute
-• `/ginfo username/link/ID`*:* Pulls info panel for entire group
+• `/rban user group`: Remote ban
+• `/runban user group`: Remote un-ban
+• `/rpunch user group`: Remote punch
+• `/rmute user group`: Remote mute
+• `/runmute user group`: Remote un-mute
+• `/ginfo username/link/ID`: Pulls info panel for entire group
 
 *Chatbot:* 
-• `/listaichats`*:* Lists the chats the chatmode is enabled in
+• `/listaichats`: Lists the chats the chatmode is enabled in
  
 *Debugging and Shell:* 
-• `/debug <on/off>`*:* Logs commands to updates.txt
-• `/logs`*:* Run this in support group to get logs in pm
-• `/eval`*:* Self explanatory
-• `/sh`*:* Runs shell command (bot owner only)
-• `/py`*:* Runs python code (bot owner only)
-• `/clearlocals`*:* As the name goes
-• `/dbcleanup`*:* Removes deleted accs and groups from db
+• `/debug <on/off>`: Logs commands to updates.txt
+• `/logs`: Run this in support group to get logs in pm
+• `/eval`: Self explanatory
+• `/sh`: Runs shell command (bot owner only)
+• `/py`: Runs python code (bot owner only)
+• `/clearlocals`: As the name goes
+• `/dbcleanup`: Removes deleted accs and groups from db
 
 Visit @{SUPPORT_CHAT} for more information.
 """
