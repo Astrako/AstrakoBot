@@ -242,7 +242,9 @@ def set_title(update: Update, context: CallbackContext):
     try:
         bot.setChatAdministratorCustomTitle(chat.id, user_id, title)
     except BadRequest:
-        message.reply_text("Either they aren't promoted by me or you set a title text that is impossible to set.")
+        message.reply_text(
+            "Either they aren't promoted by me or you set a title text that is impossible to set."
+        )
         return
 
     bot.sendMessage(
@@ -474,10 +476,16 @@ __help__ = """
 
 ADMINLIST_HANDLER = DisableAbleCommandHandler("admins", adminlist, run_async=True)
 
-PIN_HANDLER = CommandHandler("pin", pin, filters=Filters.chat_type.groups, run_async=True)
-UNPIN_HANDLER = CommandHandler("unpin", unpin, filters=Filters.chat_type.groups, run_async=True)
+PIN_HANDLER = CommandHandler(
+    "pin", pin, filters=Filters.chat_type.groups, run_async=True
+)
+UNPIN_HANDLER = CommandHandler(
+    "unpin", unpin, filters=Filters.chat_type.groups, run_async=True
+)
 
-INVITE_HANDLER = DisableAbleCommandHandler(["invitelink", "link"], invite, run_async=True)
+INVITE_HANDLER = DisableAbleCommandHandler(
+    ["invitelink", "link"], invite, run_async=True
+)
 
 PROMOTE_HANDLER = DisableAbleCommandHandler("promote", promote, run_async=True)
 DEMOTE_HANDLER = DisableAbleCommandHandler("demote", demote, run_async=True)

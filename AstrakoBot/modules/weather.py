@@ -134,11 +134,10 @@ def weather(update: Update, context: CallbackContext):
             msg += f"• **Wind:** `{kmph[0]} km/h`\n"
             msg += f"• **Sunrise**: `{sun(sunrise)}`\n"
             msg += f"• **Sunset**: `{sun(sunset)}`"
-        
+
     else:
-        msg =  "Please specify a city or country"
-            
-            
+        msg = "Please specify a city or country"
+
     delmsg = message.reply_text(
         text=msg,
         parse_mode=ParseMode.MARKDOWN,
@@ -146,6 +145,7 @@ def weather(update: Update, context: CallbackContext):
     )
 
     context.dispatcher.run_async(delete, delmsg, 60)
+
 
 WEATHER_HANDLER = CommandHandler(["weather"], weather, run_async=True)
 dispatcher.add_handler(WEATHER_HANDLER)

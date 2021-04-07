@@ -3,7 +3,13 @@ import re
 
 from telegram import ParseMode, ChatPermissions, Update
 from telegram.error import BadRequest
-from telegram.ext import CommandHandler, MessageHandler, CallbackContext, Filters, run_async
+from telegram.ext import (
+    CommandHandler,
+    MessageHandler,
+    CallbackContext,
+    Filters,
+    run_async,
+)
 from telegram.utils.helpers import mention_html
 
 import AstrakoBot.modules.sql.blacklist_sql as sql
@@ -478,7 +484,8 @@ ADD_BLACKLIST_HANDLER = CommandHandler("addblacklist", add_blacklist, run_async=
 UNBLACKLIST_HANDLER = CommandHandler("unblacklist", unblacklist, run_async=True)
 BLACKLISTMODE_HANDLER = CommandHandler("blacklistmode", blacklist_mode, run_async=True)
 BLACKLIST_DEL_HANDLER = MessageHandler(
-    (Filters.text | Filters.command | Filters.sticker | Filters.photo) & Filters.chat_type.groups,
+    (Filters.text | Filters.command | Filters.sticker | Filters.photo)
+    & Filters.chat_type.groups,
     del_blacklist,
     allow_edit=True,
     run_async=True,

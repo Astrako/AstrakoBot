@@ -56,7 +56,9 @@ ENUM_FUNC_MAP = {
 
 
 # Do not async
-def get(update: Update, context: CallbackContext, notename, show_none=True, no_format=False):
+def get(
+    update: Update, context: CallbackContext, notename, show_none=True, no_format=False
+):
     bot = context.bot
     user = update.effective_user
     chat_id = update.effective_message.chat.id
@@ -566,13 +568,21 @@ A button can be added to a note by using standard markdown link syntax - the lin
 
 __mod_name__ = "Notes"
 
-GET_HANDLER = CommandHandler("get", cmd_get, filters=Filters.chat_type.groups, run_async=True)
+GET_HANDLER = CommandHandler(
+    "get", cmd_get, filters=Filters.chat_type.groups, run_async=True
+)
 HASH_GET_HANDLER = MessageHandler(Filters.regex(r"^#[^\s]+"), hash_get, run_async=True)
 SLASH_GET_HANDLER = MessageHandler(Filters.regex(r"^/\d+$"), slash_get, run_async=True)
 SAVE_HANDLER = CommandHandler("save", save, run_async=True)
 DELETE_HANDLER = CommandHandler("clear", clear, run_async=True)
 
-LIST_HANDLER = DisableAbleCommandHandler(["notes", "saved"], list_notes, admin_ok=True, filters=Filters.chat_type.groups, run_async=True)
+LIST_HANDLER = DisableAbleCommandHandler(
+    ["notes", "saved"],
+    list_notes,
+    admin_ok=True,
+    filters=Filters.chat_type.groups,
+    run_async=True,
+)
 
 CLEARALL = DisableAbleCommandHandler("removeallnotes", clearall, run_async=True)
 CLEARALL_BTN = CallbackQueryHandler(clearall_btn, pattern=r"notes_.*", run_async=True)

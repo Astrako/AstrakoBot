@@ -107,7 +107,11 @@ def ban(update: Update, context: CallbackContext) -> str:
         )
         if reason:
             reply += f"\n<code> </code><b>•  Reason:</b> \n{html.escape(reason)}"
-        bot.sendMessage(chat.id, reply, parse_mode=ParseMode.HTML,)
+        bot.sendMessage(
+            chat.id,
+            reply,
+            parse_mode=ParseMode.HTML,
+        )
         return log
 
     except BadRequest as excp:
@@ -262,8 +266,7 @@ def punch(update: Update, context: CallbackContext) -> str:
         )
         if reason:
             reply += f"<code> </code><b>•  Reason:</b> {html.escape(reason)}"
-        bot.sendMessage(chat.id, reply, parse_mode=ParseMode.HTML
-        )
+        bot.sendMessage(chat.id, reply, parse_mode=ParseMode.HTML)
         log = (
             f"<b>{html.escape(chat.title)}:</b>\n"
             f"#KICKED\n"

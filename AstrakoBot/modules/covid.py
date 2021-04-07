@@ -12,13 +12,13 @@ def covid(update: Update, context: CallbackContext):
     message = update.effective_message
     country = message.text[len("/covid ") :]
     covid = Covid()
-    
+
     if country:
         try:
             country_data = covid.get_status_by_country_name(country)
         except:
             return message.reply_text("Wrong country name!")
-        
+
         msg = f"*Corona Virus Info*\n\n"
         msg += f"• Country: `{country}`\n"
         msg += f"• Confirmed: `{country_data['confirmed']}`\n"
@@ -30,7 +30,7 @@ def covid(update: Update, context: CallbackContext):
             f"`{datetime.utcfromtimestamp(country_data['last_update'] // 1000).strftime('%Y-%m-%d %H:%M:%S')}`\n"
         )
         msg += f"__Data provided by__ [Johns Hopkins University](https://j.mp/2xf6oxF)"
-            
+
     else:
         msg = "Please specify a country"
 

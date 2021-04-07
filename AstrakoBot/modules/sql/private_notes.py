@@ -17,6 +17,7 @@ PrivateNotes.__table__.create(checkfirst=True)
 
 PRIVATE_NOTES_INSERTION_LOCK = threading.RLock()
 
+
 def get_private_notes(chat_id) -> bool:
     try:
         private_notes = SESSION.query(PrivateNotes).get(str(chat_id))
@@ -31,9 +32,8 @@ def set_private_notes(chat_id, setting: bool):
     with PRIVATE_NOTES_INSERTION_LOCK:
         private_notes = SESSION.query(PrivateNotes).get(str(chat_id))
         if not private_notes:
-            private_notes = PrivateNotes(str(chat_id), setting = setting)
+            private_notes = PrivateNotes(str(chat_id), setting=setting)
 
         private_notes.setting = setting
         SESSION.add(private_notes)
         SESSION.commit()
-

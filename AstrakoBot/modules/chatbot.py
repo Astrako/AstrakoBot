@@ -155,7 +155,7 @@ CHATBOT_HANDLER = MessageHandler(
     Filters.text
     & (~Filters.regex(r"^#[^\s]+") & ~Filters.regex(r"^!") & ~Filters.regex(r"^\/")),
     chatbot,
-    run_async=True
+    run_async=True,
 )
 LIST_CB_CHATS_HANDLER = CommandHandler(
     "listaichats", list_chatbot_chats, filters=CustomFilters.dev_filter, run_async=True

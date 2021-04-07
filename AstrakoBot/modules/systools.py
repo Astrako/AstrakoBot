@@ -13,13 +13,24 @@ import AstrakoBot.modules.helper_funcs.git_api as git
 from datetime import datetime
 from platform import python_version, uname
 from telethon import version
-from telegram import Update, Bot, Message, Chat, ParseMode, InlineKeyboardButton, InlineKeyboardMarkup
+from telegram import (
+    Update,
+    Bot,
+    Message,
+    Chat,
+    ParseMode,
+    InlineKeyboardButton,
+    InlineKeyboardMarkup,
+)
 from telegram.ext import CommandHandler, CallbackContext, CallbackQueryHandler, Filters
 from telegram.ext.dispatcher import run_async
 from telegram.error import BadRequest, Unauthorized
 
 from AstrakoBot import DEV_USERS, LOGGER, StartTime, dispatcher
-from AstrakoBot.modules.disable import DisableAbleCommandHandler, DisableAbleRegexHandler
+from AstrakoBot.modules.disable import (
+    DisableAbleCommandHandler,
+    DisableAbleRegexHandler,
+)
 from AstrakoBot.modules.helper_funcs.misc import delete
 from AstrakoBot.modules.helper_funcs.chat_status import owner_plus, dev_plus, sudo_plus
 
@@ -90,16 +101,16 @@ def shell(update: Update, context: CallbackContext):
             file.write(msg)
         with open("shell_output.txt", "rb") as doc:
             delmsg = message.reply_document(
-                document = doc,
-                filename = doc.name,
-                reply_to_message_id = message.message_id,
+                document=doc,
+                filename=doc.name,
+                reply_to_message_id=message.message_id,
             )
     else:
 
         delmsg = message.reply_text(
-            text = msg,
-            parse_mode = ParseMode.MARKDOWN,
-            disable_web_page_preview = True,
+            text=msg,
+            parse_mode=ParseMode.MARKDOWN,
+            disable_web_page_preview=True,
         )
 
     context.dispatcher.run_async(delete, delmsg, 120)
@@ -130,16 +141,18 @@ def status(update: Update, context: CallbackContext):
     msg += f"CPU freq: `{psutil.cpu_freq().current:.2f}Mhz`\n"
     msg += f"CPU usage: `{psutil.cpu_percent()}%`\n"
     ram = psutil.virtual_memory()
-    msg += f"RAM: `{get_size(ram.total)} - {get_size(ram.used)} used ({ram.percent}%)`\n"
-    disk = psutil.disk_usage('/')
+    msg += (
+        f"RAM: `{get_size(ram.total)} - {get_size(ram.used)} used ({ram.percent}%)`\n"
+    )
+    disk = psutil.disk_usage("/")
     msg += f"Disk usage: `{get_size(disk.total)} total - {get_size(disk.used)} used ({disk.percent}%)`\n"
     swap = psutil.swap_memory()
     msg += f"SWAP: `{get_size(swap.total)} - {get_size(swap.used)} used ({swap.percent}%)`\n"
 
     delmsg = message.reply_text(
-        text = msg,
-        parse_mode = ParseMode.MARKDOWN,
-        disable_web_page_preview = True,
+        text=msg,
+        parse_mode=ParseMode.MARKDOWN,
+        disable_web_page_preview=True,
     )
 
     context.dispatcher.run_async(delete, delmsg, 120)
@@ -151,9 +164,9 @@ def get_bot_ip(update: Update, context: CallbackContext):
     ip = requests.get("http://ipinfo.io/ip")
 
     delmsg = message.reply_text(
-        text = f"*IP:* `{ip.text}`",
-        parse_mode = ParseMode.MARKDOWN,
-        disable_web_page_preview = True,
+        text=f"*IP:* `{ip.text}`",
+        parse_mode=ParseMode.MARKDOWN,
+        disable_web_page_preview=True,
     )
 
     context.dispatcher.run_async(delete, delmsg, 60)
@@ -169,11 +182,8 @@ def ping(update: Update, context: CallbackContext):
     telegram_ping = str(round((end_time - start_time) * 1000, 3)) + " ms"
     uptime = get_readable_time((time.time() - StartTime))
 
-
     delmsg = msg.edit_text(
-        "*PONG!!*\n"
-        f"Time Taken: `{telegram_ping}`\n"
-        f"Service uptime: `{uptime}`",
+        "*PONG!!*\n" f"Time Taken: `{telegram_ping}`\n" f"Service uptime: `{uptime}`",
         parse_mode=ParseMode.MARKDOWN,
     )
 
@@ -209,18 +219,18 @@ def speedtestxyz_callback(update: Update, context: CallbackContext):
         if query.data == "speedtest_image":
             speedtest_image = speed.results.share()
             delmsg = message.reply_photo(
-                photo=speedtest_image, 
+                photo=speedtest_image,
                 caption=msg,
-                parse_mode = ParseMode.MARKDOWN,
+                parse_mode=ParseMode.MARKDOWN,
             )
 
         elif query.data == "speedtest_text":
             result = speed.results.dict()
             msg += f"\nDownload: `{convert(result['download'])}Mb/s`\nUpload: `{convert(result['upload'])}Mb/s`\nPing: `{result['ping']}`"
             delmsg = message.reply_text(
-                text = msg,
-                parse_mode = ParseMode.MARKDOWN,
-                disable_web_page_preview = True,
+                text=msg,
+                parse_mode=ParseMode.MARKDOWN,
+                disable_web_page_preview=True,
             )
 
         context.dispatcher.run_async(delete, delmsg, 60)
@@ -228,17 +238,21 @@ def speedtestxyz_callback(update: Update, context: CallbackContext):
     else:
         query.answer("You are required to be a developer user to use this command.")
 
+
 IP_HANDLER = DisableAbleCommandHandler("ip", get_bot_ip, run_async=True)
 PING_HANDLER = DisableAbleCommandHandler("ping", ping, run_async=True)
 SHELL_HANDLER = DisableAbleCommandHandler(["sh"], shell, run_async=True)
-SPEED_TEST_CALLBACKHANDLER = CallbackQueryHandler(speedtestxyz_callback, pattern="speedtest_.*", run_async=True)
-SPEED_TEST_HANDLER = DisableAbleCommandHandler("speedtest", speedtestxyz, run_async=True)
+SPEED_TEST_CALLBACKHANDLER = CallbackQueryHandler(
+    speedtestxyz_callback, pattern="speedtest_.*", run_async=True
+)
+SPEED_TEST_HANDLER = DisableAbleCommandHandler(
+    "speedtest", speedtestxyz, run_async=True
+)
 STATUS_HANDLER = DisableAbleCommandHandler("status", status, run_async=True)
-  
+
 dispatcher.add_handler(IP_HANDLER)
 dispatcher.add_handler(PING_HANDLER)
 dispatcher.add_handler(SHELL_HANDLER)
 dispatcher.add_handler(SPEED_TEST_CALLBACKHANDLER)
 dispatcher.add_handler(SPEED_TEST_HANDLER)
 dispatcher.add_handler(STATUS_HANDLER)
-

@@ -3,7 +3,12 @@ import re
 
 from telegram import ParseMode, InlineKeyboardMarkup, InlineKeyboardButton, Update, Bot
 from telegram.error import BadRequest, Unauthorized
-from telegram.ext import CommandHandler, CallbackQueryHandler, CallbackContext, run_async
+from telegram.ext import (
+    CommandHandler,
+    CallbackQueryHandler,
+    CallbackContext,
+    run_async,
+)
 
 import AstrakoBot.modules.sql.connection_sql as sql
 from AstrakoBot import dispatcher, DRAGONS, DEV_USERS
@@ -404,7 +409,9 @@ ALLOW_CONNECTIONS_HANDLER = CommandHandler(
     "allowconnect", allow_connections, run_async=True
 )
 HELP_CONNECT_CHAT_HANDLER = CommandHandler("helpconnect", help_connect_chat)
-CONNECT_BTN_HANDLER = CallbackQueryHandler(connect_button, pattern=r"connect", run_async=True)
+CONNECT_BTN_HANDLER = CallbackQueryHandler(
+    connect_button, pattern=r"connect", run_async=True
+)
 
 dispatcher.add_handler(CONNECT_CHAT_HANDLER)
 dispatcher.add_handler(CONNECTION_CHAT_HANDLER)

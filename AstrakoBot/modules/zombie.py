@@ -14,9 +14,7 @@ async def zombies(event):
     admin = chat.admin_rights
     creator = chat.creator
 
-    if not await user_is_admin(
-        user_id = event.sender_id, message = event
-    ):
+    if not await user_is_admin(user_id=event.sender_id, message=event):
         msg = f"Only Admins are allowed to use this command"
 
     elif not admin and not creator:
@@ -28,17 +26,17 @@ async def zombies(event):
         arg = event.pattern_match.group(1).lower()
 
         if not arg:
-                msg = f"**Searching for zombies...**\n"
-                async for user in event.client.iter_participants(event.chat):
-                    if user.deleted:
-                        count += 1
+            msg = f"**Searching for zombies...**\n"
+            async for user in event.client.iter_participants(event.chat):
+                if user.deleted:
+                    count += 1
 
-                if count == 0:
-                    msg += f"No deleted accounts found. Group is clean"
-                else:
-                    msg += f"Found **{count}** zombies in this group\n"
-                    msg += f"Clean them by using - `/zombies clean`"
-        
+            if count == 0:
+                msg += f"No deleted accounts found. Group is clean"
+            else:
+                msg += f"Found **{count}** zombies in this group\n"
+                msg += f"Clean them by using - `/zombies clean`"
+
         elif arg == "clean":
             msg = f"**Cleaning zombies...**\n"
             async for user in event.client.iter_participants(event.chat):
@@ -50,12 +48,10 @@ async def zombies(event):
                 msg += f"No zombies account found. Group is clean"
             else:
                 msg += f"Cleaned `{count}` zombies"
-      
+
         else:
             msg = "Wrong parameter. You can use only `/zombies clean`"
-
 
     delmsg = await event.reply(msg)
     await sleep(60)
     await delmsg.delete()
-

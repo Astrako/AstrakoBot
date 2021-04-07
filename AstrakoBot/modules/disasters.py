@@ -497,7 +497,9 @@ SUPPORT_HANDLER = CommandHandler(("addsupport"), addsupport, run_async=True)
 WHITELIST_HANDLER = CommandHandler(("addwhitelist"), addwhitelist, run_async=True)
 UNSUDO_HANDLER = CommandHandler(("removesudo"), removesudo, run_async=True)
 UNSUPPORT_HANDLER = CommandHandler(("removesupport"), removesupport, run_async=True)
-UNWHITELIST_HANDLER = CommandHandler(("removewhitelist"), removewhitelist, run_async=True)
+UNWHITELIST_HANDLER = CommandHandler(
+    ("removewhitelist"), removewhitelist, run_async=True
+)
 
 WHITELISTLIST_HANDLER = CommandHandler(("whitelistlist"), whitelistlist, run_async=True)
 SUPPORTLIST_HANDLER = CommandHandler(("supportlist"), supportlist, run_async=True)

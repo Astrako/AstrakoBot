@@ -31,7 +31,9 @@ from telegram import (
 
 
 def getphh(index):
-    recentRelease = api.getReleaseData(api.getData("phhusson/treble_experimentations"), index)
+    recentRelease = api.getReleaseData(
+        api.getData("phhusson/treble_experimentations"), index
+    )
     if recentRelease is None:
         return "The specified release could not be found"
     author = api.getAuthor(recentRelease)
@@ -40,7 +42,7 @@ def getphh(index):
     assets = api.getAssets(recentRelease)
     releaseName = api.getReleaseName(recentRelease)
     message = "<b>Author:</b> <a href='{}'>{}</a>\n".format(authorUrl, author)
-    message += "<b>Release Name:</b> <code>"+releaseName+"</code>\n\n"
+    message += "<b>Release Name:</b> <code>" + releaseName + "</code>\n\n"
     message += "<b>Assets:</b>\n"
     for asset in assets:
         fileName = api.getReleaseFileName(asset)
@@ -48,10 +50,10 @@ def getphh(index):
             continue
         fileURL = api.getReleaseFileURL(asset)
         assetFile = "• <a href='{}'>{}</a>".format(fileURL, fileName)
-        sizeB = ((api.getSize(asset))/1024)/1024
+        sizeB = ((api.getSize(asset)) / 1024) / 1024
         size = "{0:.2f}".format(sizeB)
         message += assetFile + "\n"
-        message += "    <code>Size: "  + size + " MB</code>\n"
+        message += "    <code>Size: " + size + " MB</code>\n"
     return message
 
 
@@ -256,8 +258,12 @@ FETCH_HANDLER = DisableAbleCommandHandler(
 )
 SAVEREPO_HANDLER = CommandHandler("saverepo", saveRepo, run_async=True)
 DELREPO_HANDLER = CommandHandler("delrepo", delRepo, run_async=True)
-LISTREPO_HANDLER = DisableAbleCommandHandler("listrepo", listRepo, admin_ok=True, run_async=True)
-VERCHECKER_HANDLER = DisableAbleCommandHandler("gitver", getVer, admin_ok=True, run_async=True)
+LISTREPO_HANDLER = DisableAbleCommandHandler(
+    "listrepo", listRepo, admin_ok=True, run_async=True
+)
+VERCHECKER_HANDLER = DisableAbleCommandHandler(
+    "gitver", getVer, admin_ok=True, run_async=True
+)
 CHANGELOG_HANDLER = DisableAbleCommandHandler(
     "changelog", changelog, admin_ok=True, run_async=True
 )
