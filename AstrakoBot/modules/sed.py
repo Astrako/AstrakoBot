@@ -79,13 +79,6 @@ def sed(update: Update, context: CallbackContext):
                 check = regex.match(repl, to_fix, flags=regex.IGNORECASE, timeout=5)
             except TimeoutError:
                 return
-            if check and check.group(0).lower() == to_fix.lower():
-                update.effective_message.reply_to_message.reply_text(
-                    "Hey everyone, {} is trying to make "
-                    "me say stuff I don't wanna "
-                    "say!".format(update.effective_user.first_name)
-                )
-                return
             if infinite_loop_check(repl):
                 update.effective_message.reply_text(
                     "I'm afraid I can't run that regex."
