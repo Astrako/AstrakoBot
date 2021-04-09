@@ -100,7 +100,6 @@ def ban(update: Update, context: CallbackContext) -> str:
             message.delete()
             return log
 
-        # bot.send_sticker(chat.id, BAN_STICKER)  # banhammer marie sticker
         reply = (
             f"<code>❕</code><b>Ban Event</b>\n"
             f"<code> </code><b>•  User:</b> {mention_html(member.user.id, html.escape(member.user.first_name))}"
@@ -189,7 +188,6 @@ def temp_ban(update: Update, context: CallbackContext) -> str:
 
     try:
         chat.kick_member(user_id, until_date=bantime)
-        # bot.send_sticker(chat.id, BAN_STICKER)  # banhammer marie sticker
         bot.sendMessage(
             chat.id,
             f"Banned! User {mention_html(member.user.id, html.escape(member.user.first_name))} "
@@ -255,7 +253,6 @@ def punch(update: Update, context: CallbackContext) -> str:
 
     res = chat.unban_member(user_id)  # unban on current user = kick
     if res:
-        # bot.send_sticker(chat.id, BAN_STICKER)  # banhammer marie sticker
         reply = (
             f"<code>❕</code><b>Punch Event</b>\n"
             f"<code> </code><b>•  User:</b> {mention_html(member.user.id, html.escape(member.user.first_name))}\n"
@@ -402,13 +399,11 @@ __help__ = """
 """
 
 BAN_HANDLER = DisableAbleCommandHandler(["ban", "sban"], ban, run_async=True)
-TEMPBAN_HANDLER = DisableAbleCommandHandler(["tban"], temp_ban, run_async=True)
+TEMPBAN_HANDLER = DisableAbleCommandHandler("tban", temp_ban, run_async=True)
 PUNCH_HANDLER = DisableAbleCommandHandler(["punch", "kick"], punch, run_async=True)
 UNBAN_HANDLER = DisableAbleCommandHandler("unban", unban, run_async=True)
 ROAR_HANDLER = DisableAbleCommandHandler("roar", selfunban, run_async=True)
-PUNCHME_HANDLER = DisableAbleCommandHandler(
-    ["punchme", "kickme"], punchme, filters=Filters.chat_type.groups, run_async=True
-)
+PUNCHME_HANDLER = DisableAbleCommandHandler(["punchme", "kickme"], punchme, filters=Filters.chat_type.groups, run_async=True)
 
 dispatcher.add_handler(BAN_HANDLER)
 dispatcher.add_handler(TEMPBAN_HANDLER)
