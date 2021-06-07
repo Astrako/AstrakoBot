@@ -630,7 +630,7 @@ def fed_ban(update: Update, context: CallbackContext):
             send_message(update.effective_message, excp.message)
             return
         elif len(str(user_id)) != 9:
-            send_message(update.effective_message, "That's so not a user!")
+            send_message(update.effective_message, "That's not a user!")
             return
         isvalid = False
         fban_user_id = int(user_id)
@@ -639,7 +639,7 @@ def fed_ban(update: Update, context: CallbackContext):
         fban_user_uname = None
 
     if isvalid and user_chat.type != "private":
-        send_message(update.effective_message, "That's so not a user!")
+        send_message(update.effective_message, "That's not a user!")
         return
 
     if isvalid:
@@ -1010,7 +1010,7 @@ def unfban(update: Update, context: CallbackContext):
             send_message(update.effective_message, excp.message)
             return
         elif len(str(user_id)) != 9:
-            send_message(update.effective_message, "That's so not a user!")
+            send_message(update.effective_message, "That's not a user!")
             return
         isvalid = False
         fban_user_id = int(user_id)
@@ -1019,7 +1019,7 @@ def unfban(update: Update, context: CallbackContext):
         fban_user_uname = None
 
     if isvalid and user_chat.type != "private":
-        message.reply_text("That's so not a user!")
+        message.reply_text("That's not a user!")
         return
 
     if isvalid:
