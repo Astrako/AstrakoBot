@@ -19,7 +19,10 @@ from AstrakoBot import (
 )
 from AstrakoBot.modules.disable import DisableAbleCommandHandler
 from AstrakoBot.modules.helper_funcs.alternate import send_message
-from AstrakoBot.modules.helper_funcs.chat_status import is_user_admin
+from AstrakoBot.modules.helper_funcs.chat_status import (
+    is_user_admin,
+    can_delete,
+)
 from AstrakoBot.modules.helper_funcs.extraction import (
     extract_unt_fedban,
     extract_user,
@@ -711,6 +714,12 @@ def fed_ban(update: Update, context: CallbackContext):
                 ),
                 parse_mode="HTML",
             )
+        if message.text.startswith("/s"):
+            silent = True
+            if not can_delete(chat, context.bot.id):
+                return ""
+        else:
+            silent = False
         # If fedlog is set, then send message, except fedlog is current chat
         get_fedlog = sql.get_fed_log(fed_id)
         if get_fedlog:
@@ -851,6 +860,12 @@ def fed_ban(update: Update, context: CallbackContext):
         ),
         parse_mode="HTML",
     )
+    if message.text.startswith("/s"):
+        silent = True
+        if not can_delete(chat, context.bot.id):
+            return ""
+    else:
+        silent = False
     # Send message to owner if fednotif is enabled
     if getfednotif:
         bot.send_message(
@@ -964,6 +979,11 @@ def fed_ban(update: Update, context: CallbackContext):
     #    send_message(update.effective_message,
     #                 "Fedban affected {} chats. ".format(chats_in_fed))
 
+        if silent:
+            if message.reply_to_message:
+                message.reply_to_message.delete()
+            message.delete()
+        return
 
 def unfban(update: Update, context: CallbackContext):
     bot, args = context.bot, context.args
@@ -2382,7 +2402,7 @@ LEAVE_FED_HANDLER = CommandHandler("leavefed", leave_fed, run_async=True)
 PROMOTE_FED_HANDLER = CommandHandler("fpromote", user_join_fed, run_async=True)
 DEMOTE_FED_HANDLER = CommandHandler("fdemote", user_demote_fed, run_async=True)
 INFO_FED_HANDLER = CommandHandler("fedinfo", fed_info, run_async=True)
-BAN_FED_HANDLER = DisableAbleCommandHandler("fban", fed_ban, run_async=True)
+BAN_FED_HANDLER = DisableAbleCommandHandler(["fban", "sfban"], fed_ban, run_async=True)
 UN_BAN_FED_HANDLER = CommandHandler("unfban", unfban, run_async=True)
 FED_BROADCAST_HANDLER = CommandHandler("fbroadcast", fed_broadcast, run_async=True)
 FED_SET_RULES_HANDLER = CommandHandler("setfrules", set_frules, run_async=True)
