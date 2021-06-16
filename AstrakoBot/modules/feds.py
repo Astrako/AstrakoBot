@@ -194,7 +194,7 @@ def rename_fed(update: Update, context: CallbackContext):
     verify_fed = sql.get_fed_info(fed_id)
 
     if not verify_fed:
-        return msg.reply_text("This fed not exist in my database!")
+        return msg.reply_text("This fed does not exist in my database!")
 
     if is_user_fed_owner(fed_id, user.id):
         sql.rename_fed(fed_id, user.id, newname)
@@ -238,7 +238,7 @@ def join_fed(update: Update, context: CallbackContext):
     if chat.type == "private":
         send_message(
             update.effective_message,
-            "This command is specific to the group, not to our pm!",
+            "This command is specific to groups, not our pm!",
         )
         return
 
@@ -272,7 +272,7 @@ def join_fed(update: Update, context: CallbackContext):
         x = sql.chat_join_fed(args[0], chat.title, chat.id)
         if not x:
             message.reply_text(
-                f"Failed to join federation! Please contact @{SUPPORT_CHAT} should this problem persist!"
+                f"Failed to join federation! Please contact @{SUPPORT_CHAT} if this problem persists!"
             )
             return
 
@@ -300,7 +300,7 @@ def leave_fed(update: Update, context: CallbackContext):
     if chat.type == "private":
         send_message(
             update.effective_message,
-            "This command is specific to the group, not to our PM!",
+            "This command is specific to groups, not our pm!",
         )
         return
 
@@ -342,7 +342,7 @@ def user_join_fed(update: Update, context: CallbackContext):
     if chat.type == "private":
         send_message(
             update.effective_message,
-            "This command is specific to the group, not to our pm!",
+            "This command is specific to groups, not our pm!",
         )
         return
 
@@ -404,7 +404,7 @@ def user_demote_fed(update: Update, context: CallbackContext):
     if chat.type == "private":
         send_message(
             update.effective_message,
-            "This command is specific to the group, not to our pm!",
+            "This command is specific to groups, not our pm!",
         )
         return
 
@@ -515,7 +515,7 @@ def fed_admin(update: Update, context: CallbackContext):
     if chat.type == "private":
         send_message(
             update.effective_message,
-            "This command is specific to the group, not to our pm!",
+            "This command is specific to groups, not our pm!",
         )
         return
 
@@ -562,7 +562,7 @@ def fed_ban(update: Update, context: CallbackContext):
     if chat.type == "private":
         send_message(
             update.effective_message,
-            "This command is specific to the group, not to our pm!",
+            "This command is specific to groups, not our pm!",
         )
         return
 
@@ -759,7 +759,7 @@ def fed_ban(update: Update, context: CallbackContext):
                     except Unauthorized:
                         sql.chat_leave_fed(fedschat)
                         LOGGER.info(
-                            "Chat {} has leave fed {} because I was kicked".format(
+                            "Chat {} has left the fed {} because I was kicked".format(
                                 fedschat, info["fname"]
                             )
                         )
@@ -800,7 +800,7 @@ def fed_ban(update: Update, context: CallbackContext):
                                 targetfed_id = sql.get_fed_id(fedschat)
                                 sql.unsubs_fed(fed_id, targetfed_id)
                                 LOGGER.info(
-                                    "Chat {} has unsub fed {} because I was kicked".format(
+                                    "Chat {} has unsubbed from the fed {} because I was kicked".format(
                                         fedschat, info["fname"]
                                     )
                                 )
@@ -809,7 +809,7 @@ def fed_ban(update: Update, context: CallbackContext):
                             break
                         else:
                             LOGGER.warning(
-                                "Unable to fban on {} because: {}".format(
+                                "Unable to execute fban on {} because: {}".format(
                                     fedschat, excp.message
                                 )
                             )
@@ -958,7 +958,7 @@ def fed_ban(update: Update, context: CallbackContext):
                                 targetfed_id = sql.get_fed_id(fedschat)
                                 sql.unsubs_fed(fed_id, targetfed_id)
                                 LOGGER.info(
-                                    "Chat {} has unsub fed {} because I was kicked".format(
+                                    "Chat {} has unsubbed from the fed {} because I was kicked".format(
                                         fedschat, info["fname"]
                                     )
                                 )
@@ -967,7 +967,7 @@ def fed_ban(update: Update, context: CallbackContext):
                             break
                         else:
                             LOGGER.warning(
-                                "Unable to fban on {} because: {}".format(
+                                "Unable to execute fban on {} because: {}".format(
                                     fedschat, excp.message
                                 )
                             )
@@ -979,11 +979,12 @@ def fed_ban(update: Update, context: CallbackContext):
     #    send_message(update.effective_message,
     #                 "Fedban affected {} chats. ".format(chats_in_fed))
 
-        if silent:
-            if message.reply_to_message:
-                message.reply_to_message.delete()
-            message.delete()
-        return
+      if silent:
+        if message.reply_to_message:
+          message.reply_to_message.delete()
+          message.delete()
+      return
+    
 
 def unfban(update: Update, context: CallbackContext):
     bot, args = context.bot, context.args
@@ -994,7 +995,7 @@ def unfban(update: Update, context: CallbackContext):
     if chat.type == "private":
         send_message(
             update.effective_message,
-            "This command is specific to the group, not to our pm!",
+            "This command is specific to groups, not our pm!",
         )
         return
 
@@ -1160,7 +1161,7 @@ def unfban(update: Update, context: CallbackContext):
                             targetfed_id = sql.get_fed_id(fedschat)
                             sql.unsubs_fed(fed_id, targetfed_id)
                             LOGGER.info(
-                                "Chat {} has unsub fed {} because I was kicked".format(
+                                "Chat {} has unsubbed from the fed {} because I was kicked".format(
                                     fedschat, info["fname"]
                                 )
                             )
@@ -1169,7 +1170,7 @@ def unfban(update: Update, context: CallbackContext):
                         break
                     else:
                         LOGGER.warning(
-                            "Unable to fban on {} because: {}".format(
+                            "Unable to execute fban on {} because: {}".format(
                                 fedschat, excp.message
                             )
                         )
@@ -1212,7 +1213,7 @@ def set_frules(update: Update, context: CallbackContext):
     if chat.type == "private":
         send_message(
             update.effective_message,
-            "This command is specific to the group, not to our pm!",
+            "This command is specific to groups, not our pm!",
         )
         return
 
@@ -1239,7 +1240,7 @@ def set_frules(update: Update, context: CallbackContext):
         x = sql.set_frules(fed_id, markdown_rules)
         if not x:
             update.effective_message.reply_text(
-                f"Whoa! There was an error while setting federation rules! If you wondered why please ask it in @{SUPPORT_CHAT}!"
+                f"Whoa! There was an error while setting federation rules! If you wondered why please ask in @{SUPPORT_CHAT}!"
             )
             return
 
@@ -1250,7 +1251,7 @@ def set_frules(update: Update, context: CallbackContext):
             if ast.literal_eval(get_fedlog):
                 bot.send_message(
                     get_fedlog,
-                    "*{}* has updated federation rules for fed *{}*".format(
+                    "*{}* has updated the federation rules for the fed *{}*".format(
                         user.first_name, getfed["fname"]
                     ),
                     parse_mode="markdown",
@@ -1267,7 +1268,7 @@ def get_frules(update: Update, context: CallbackContext):
     if chat.type == "private":
         send_message(
             update.effective_message,
-            "This command is specific to the group, not to our pm!",
+            "This command is specific to groups, not our pm!",
         )
         return
 
@@ -1291,7 +1292,7 @@ def fed_broadcast(update: Update, context: CallbackContext):
     if chat.type == "private":
         send_message(
             update.effective_message,
-            "This command is specific to the group, not to our pm!",
+            "This command is specific to groups, not our pm!",
         )
         return
 
@@ -1327,7 +1328,7 @@ def fed_broadcast(update: Update, context: CallbackContext):
                     failed += 1
                     sql.chat_leave_fed(chat)
                     LOGGER.info(
-                        "Chat {} has left fed {} because I was punched".format(
+                        "Chat {} has left the fed {} because I was punched".format(
                             chat, fedinfo["fname"]
                         )
                     )
@@ -1351,7 +1352,7 @@ def fed_ban_list(update: Update, context: CallbackContext):
     if chat.type == "private":
         send_message(
             update.effective_message,
-            "This command is specific to the group, not to our pm!",
+            "This command is specific to groups, not our pm!",
         )
         return
 
@@ -1540,12 +1541,12 @@ def fed_notif(update: Update, context: CallbackContext):
         if args[0] in ("yes", "on"):
             sql.set_feds_setting(user.id, True)
             msg.reply_text(
-                "Reporting Federation back up! Every user who is fban / unfban you will be notified via PM."
+                "Reporting Federation back up! For every user who gets fban / unfban, you will be notified via PM."
             )
         elif args[0] in ("no", "off"):
             sql.set_feds_setting(user.id, False)
             msg.reply_text(
-                "Reporting Federation has stopped! Every user who is fban / unfban you will not be notified via PM."
+                "Reporting Federation has stopped! For every user who gets fban / unfban, you will not be notified via PM."
             )
         else:
             msg.reply_text("Please enter `on`/`off`", parse_mode="markdown")
@@ -1565,7 +1566,7 @@ def fed_chats(update: Update, context: CallbackContext):
     if chat.type == "private":
         send_message(
             update.effective_message,
-            "This command is specific to the group, not to our pm!",
+            "This command is specific to groups, not our pm!",
         )
         return
 
@@ -1597,7 +1598,7 @@ def fed_chats(update: Update, context: CallbackContext):
         except Unauthorized:
             sql.chat_leave_fed(chats)
             LOGGER.info(
-                "Chat {} has leave fed {} because I was kicked".format(
+                "Chat {} has left the fed {} because I was kicked".format(
                     chats, info["fname"]
                 )
             )
@@ -1629,7 +1630,7 @@ def fed_import_bans(update: Update, context: CallbackContext):
     if chat.type == "private":
         send_message(
             update.effective_message,
-            "This command is specific to the group, not to our pm!",
+            "This command is specific to groups, not our pm!",
         )
         return
 
@@ -1823,7 +1824,7 @@ def fed_import_bans(update: Update, context: CallbackContext):
                 )
             csvFile.close()
             os.remove("fban_{}.csv".format(msg.reply_to_message.document.file_id))
-            text = "Files were imported successfully. {} people banned.".format(success)
+            text = "Files were imported successfully. {} people are banned.".format(success)
             if failed >= 1:
                 text += " {} Failed to import.".format(failed)
             get_fedlog = sql.get_fed_log(fed_id)
@@ -1979,7 +1980,7 @@ def set_fed_log(update: Update, context: CallbackContext):
     if chat.type == "private":
         send_message(
             update.effective_message,
-            "This command is specific to the group, not to our pm!",
+            "This command is specific to groups, not our pm!",
         )
         return
 
@@ -2019,7 +2020,7 @@ def unset_fed_log(update: Update, context: CallbackContext):
     if chat.type == "private":
         send_message(
             update.effective_message,
-            "This command is specific to the group, not to our pm!",
+            "This command is specific to groups, not our pm!",
         )
         return
 
@@ -2059,7 +2060,7 @@ def subs_feds(update: Update, context: CallbackContext):
     if chat.type == "private":
         send_message(
             update.effective_message,
-            "This command is specific to the group, not to our pm!",
+            "This command is specific to groups, not our pm!",
         )
         return
 
@@ -2071,7 +2072,7 @@ def subs_feds(update: Update, context: CallbackContext):
         return
 
     if is_user_fed_owner(fed_id, user.id) is False:
-        send_message(update.effective_message, "Only fed owner can do this!")
+        send_message(update.effective_message, "Only the fed owner can do this!")
         return
 
     if args:
@@ -2085,7 +2086,7 @@ def subs_feds(update: Update, context: CallbackContext):
         if subfed:
             send_message(
                 update.effective_message,
-                "Federation `{}` has subscribe the federation `{}`. Every time there is a Fedban from that federation, this federation will also banned that user.".format(
+                "Federation `{}` has subscribed to the federation `{}`. Every time there is a Fedban from that federation, this federation will also ban that user.".format(
                     fedinfo["fname"], getfed["fname"]
                 ),
                 parse_mode="markdown",
@@ -2095,7 +2096,7 @@ def subs_feds(update: Update, context: CallbackContext):
                 if int(get_fedlog) != int(chat.id):
                     bot.send_message(
                         get_fedlog,
-                        "Federation `{}` has subscribe the federation `{}`".format(
+                        "Federation `{}` has subscribed to the federation `{}`".format(
                             fedinfo["fname"], getfed["fname"]
                         ),
                         parse_mode="markdown",
@@ -2103,7 +2104,7 @@ def subs_feds(update: Update, context: CallbackContext):
         else:
             send_message(
                 update.effective_message,
-                "Federation `{}` already subscribe the federation `{}`.".format(
+                "Federation `{}` is already subscribed the federation `{}`.".format(
                     fedinfo["fname"], getfed["fname"]
                 ),
                 parse_mode="markdown",
@@ -2123,7 +2124,7 @@ def unsubs_feds(update: Update, context: CallbackContext):
     if chat.type == "private":
         send_message(
             update.effective_message,
-            "This command is specific to the group, not to our pm!",
+            "This command is specific to groups, not our pm!",
         )
         return
 
@@ -2135,7 +2136,7 @@ def unsubs_feds(update: Update, context: CallbackContext):
         return
 
     if is_user_fed_owner(fed_id, user.id) is False:
-        send_message(update.effective_message, "Only fed owner can do this!")
+        send_message(update.effective_message, "Only the fed owner can do this!")
         return
 
     if args:
@@ -2149,7 +2150,7 @@ def unsubs_feds(update: Update, context: CallbackContext):
         if subfed:
             send_message(
                 update.effective_message,
-                "Federation `{}` now unsubscribe fed `{}`.".format(
+                "Federation `{}` now unsubscribed from the fed `{}`.".format(
                     fedinfo["fname"], getfed["fname"]
                 ),
                 parse_mode="markdown",
@@ -2159,7 +2160,7 @@ def unsubs_feds(update: Update, context: CallbackContext):
                 if int(get_fedlog) != int(chat.id):
                     bot.send_message(
                         get_fedlog,
-                        "Federation `{}` has unsubscribe fed `{}`.".format(
+                        "Federation `{}` has unsubscribed from the fed `{}`.".format(
                             fedinfo["fname"], getfed["fname"]
                         ),
                         parse_mode="markdown",
@@ -2167,7 +2168,7 @@ def unsubs_feds(update: Update, context: CallbackContext):
         else:
             send_message(
                 update.effective_message,
-                "Federation `{}` is not subscribing `{}`.".format(
+                "Federation `{}` is not subscribed to `{}`.".format(
                     fedinfo["fname"], getfed["fname"]
                 ),
                 parse_mode="markdown",
@@ -2187,7 +2188,7 @@ def get_myfedsubs(update: Update, context: CallbackContext):
     if chat.type == "private":
         send_message(
             update.effective_message,
-            "This command is specific to the group, not to our pm!",
+            "This command is specific to groups, not our pm!",
         )
         return
 
@@ -2199,7 +2200,7 @@ def get_myfedsubs(update: Update, context: CallbackContext):
         return
 
     if is_user_fed_owner(fed_id, user.id) is False:
-        send_message(update.effective_message, "Only fed owner can do this!")
+        send_message(update.effective_message, "Only the fed owner can do this!")
         return
 
     try:
@@ -2210,14 +2211,14 @@ def get_myfedsubs(update: Update, context: CallbackContext):
     if len(getmy) == 0:
         send_message(
             update.effective_message,
-            "Federation `{}` is not subscribing any federation.".format(
+            "Federation `{}` is not subscribed to any federation.".format(
                 fedinfo["fname"]
             ),
             parse_mode="markdown",
         )
         return
     else:
-        listfed = "Federation `{}` is subscribing federation:\n".format(
+        listfed = "Federation `{}` is subscribed to federation:\n".format(
             fedinfo["fname"]
         )
         for x in getmy:
@@ -2235,11 +2236,11 @@ def get_myfeds_list(update: Update, context: CallbackContext):
 
     fedowner = sql.get_user_owner_fed_full(user.id)
     if fedowner:
-        text = "*You are owner of feds:\n*"
+        text = "*You are the owner of feds:\n*"
         for f in fedowner:
             text += "- `{}`: *{}*\n".format(f["fed_id"], f["fed"]["fname"])
     else:
-        text = "*You are not have any feds!*"
+        text = "*You do not have any feds!*"
     send_message(update.effective_message, text, parse_mode="markdown")
 
 
@@ -2276,7 +2277,7 @@ def welcome_fed(update: Update, context: CallbackContext):
     fban, fbanreason, fbantime = sql.get_fban_user(fed_id, user.id)
     if fban:
         update.effective_message.reply_text(
-            "This user is banned in current federation! I will remove him."
+            "This user is banned in the current federation! I will remove him."
         )
         bot.kick_chat_member(chat.id, user.id)
         return True
