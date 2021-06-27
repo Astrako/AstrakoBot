@@ -472,7 +472,7 @@ def rmall_filters(update: Update, context: CallbackContext):
     member = chat.get_member(user.id)
     if member.status != "creator" and user.id not in SUDO_USERS:
         update.effective_message.reply_text(
-            "Only the chat owner can clear all notes at once."
+            "Only the chat owner can clear all filters at once."
         )
     else:
         buttons = InlineKeyboardMarkup(
