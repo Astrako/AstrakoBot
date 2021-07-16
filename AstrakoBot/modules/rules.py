@@ -1,6 +1,7 @@
 from typing import Optional
 
 import AstrakoBot.modules.sql.rules_sql as sql
+import AstrakoBot.modules.sql.feds_sql as fsql
 from AstrakoBot import dispatcher
 from AstrakoBot.modules.helper_funcs.chat_status import user_admin
 from AstrakoBot.modules.helper_funcs.string_handling import markdown_parser
@@ -42,12 +43,24 @@ def send_rules(update, chat_id, from_pm=False):
 
     rules = sql.get_rules(chat_id)
     text = f"The rules for *{escape_markdown(chat.title)}* are:\n\n{rules}"
-
+    fed_id = fsql.get_fed_id(chat.id)
+    frules = fsql.get_frules(fed_id)
     if from_pm and rules:
         bot.send_message(
             user.id, text, parse_mode=ParseMode.MARKDOWN, disable_web_page_preview=True
         )
-    elif from_pm:
+    elif from_pm and fed_id and frules and not rules:
+        ftext = f" The admins of *{escape_markdown(chat.title)}* haven't set any rules yet.\n*Reverting to the rules set by the fed admins:*\n\n {frules}"
+        bot.send_message(
+            user.id, ftext, parse_mode=ParseMode.MARKDOWN, disable_web_page_preview=True
+        )
+    elif from_pm and fed_id and not frules and not rules:
+        bot.send_message(
+            user.id,
+            "The group admins haven't set any rules for this chat yet. "
+            "This probably doesn't mean it's lawless though...!",
+        )
+    elif from_pm and not fed_id and not rules:
         bot.send_message(
             user.id,
             "The group admins haven't set any rules for this chat yet. "
@@ -74,6 +87,19 @@ def send_rules(update, chat_id, from_pm=False):
                     [
                         InlineKeyboardButton(
                             text="Rules", url=f"t.me/{bot.username}?start={chat_id}"
+                        )
+                    ]
+                ]
+            ),
+        )
+    elif fed_id and frules and not rules:
+        update.effective_message.reply_text(
+            "The group admins haven't set any rules for this chat yet.\nPlease click the button below to see the fed rules.",
+            reply_markup=InlineKeyboardMarkup(
+                [
+                    [
+                        InlineKeyboardButton(
+                            text="Fed Rules", url=f"t.me/{bot.username}?start={chat_id}"
                         )
                     ]
                 ]
