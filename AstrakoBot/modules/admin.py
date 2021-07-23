@@ -284,6 +284,16 @@ def pin(update: Update, context: CallbackContext) -> str:
             or args[0].lower() == "violent"
         )
 
+    message = update.effective_message
+    pinner = chat.get_member(user.id)
+
+    if (
+        not (pinner.can_pin_messages or pinner.status == "creator")
+        and user.id not in SUDO_USERS
+    ):
+        message.reply_text("You don't have the necessary rights to do that!")
+        return
+
     if prev_message and is_group:
         try:
             bot.pinChatMessage(
@@ -311,6 +321,15 @@ def unpin(update: Update, context: CallbackContext) -> str:
     bot = context.bot
     chat = update.effective_chat
     user = update.effective_user
+    message = update.effective_message
+    unpinner = chat.get_member(user.id)
+
+    if (
+        not (unpinner.can_pin_messages or unpinner.status == "creator")
+        and user.id not in SUDO_USERS
+    ):
+        message.reply_text("You don't have the necessary rights to do that!")
+        return
 
     try:
         bot.unpinChatMessage(chat.id)
