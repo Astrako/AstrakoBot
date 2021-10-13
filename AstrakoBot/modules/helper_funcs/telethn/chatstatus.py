@@ -107,3 +107,12 @@ async def can_delete_messages(message):
         return status
     else:
         return False
+
+async def user_can_purge(user_id: int, message):
+    status = False
+    if message.is_private:
+        return True
+
+    perms = await telethn.get_permissions(message.chat_id, user_id)
+    status = perms.delete_messages
+    return status

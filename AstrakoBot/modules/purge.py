@@ -2,6 +2,7 @@ from asyncio import sleep
 from AstrakoBot.modules.helper_funcs.telethn.chatstatus import (
     can_delete_messages,
     user_is_admin,
+    user_can_purge,
 )
 from AstrakoBot import telethn
 import time
@@ -26,6 +27,10 @@ async def purge_messages(event):
         user_id=event.sender_id, message=event
     ) and event.from_id not in [1087968824]:
         await event.reply("Only Admins are allowed to use this command")
+        return
+
+    if not await user_can_purge(user_id=event.sender_id, message=event):
+        await event.reply("You don't have the permission to delete messages")
         return
 
     if not await can_delete_messages(message=event):
@@ -71,6 +76,10 @@ async def delete_messages(event):
         user_id=event.sender_id, message=event
     ) and event.from_id not in [1087968824]:
         await event.reply("Only Admins are allowed to use this command")
+        return
+
+    if not await user_can_purge(user_id=event.sender_id, message=event):
+        await event.reply("You don't have the permission to delete messages")
         return
 
     if not await can_delete_messages(message=event):
