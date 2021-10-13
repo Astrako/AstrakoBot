@@ -15,7 +15,7 @@ from AstrakoBot.modules.helper_funcs.telethn.chatstatus import (
 )
 
 from AstrakoBot.modules.sql.clear_cmd_sql import get_clearcmd
-
+from telethon.errors.rpcerrorlist import MessageDeleteForbiddenError
 
 @telethn.on(events.NewMessage(pattern="^[!/]purge$"))
 async def purge_messages(event):
@@ -82,17 +82,34 @@ async def delete_messages(event):
         await event.reply("You don't have the permission to delete messages")
         return
 
-    if not await can_delete_messages(message=event):
-        await event.reply("Can't seem to delete this?")
-        return
-
     message = await event.get_reply_message()
+    me = await telethn.get_me()
+    BOT_ID = me.id
+
+    if not await can_delete_messages(message=event)\
+        and message\
+            and not int(message.sender.id) == int(BOT_ID):
+        if event.chat.admin_rights is None:
+            return await event.reply(
+                "I'm not an admin, do you mind promoting me first?"
+                )
+        elif not event.chat.admin_rights.delete_messages:
+            return await event.reply(
+                "I don't have the permission to delete messages!"
+                )
+
     if not message:
         await event.reply("Whadya want to delete?")
         return
     chat = await event.get_input_chat()
-    del_message = [message, event.message]
-    await event.client.delete_messages(chat, del_message)
+    # del_message = [message, event.message]
+    # Separated to make it possible for the bot to delete its own messages even if its not an admin
+    await event.client.delete_messages(chat, message)
+    try:
+        await event.client.delete_messages(chat, event.message)
+    except MessageDeleteForbiddenError:
+        print("error in deleting message {} in {}".format(event.message.id, event.chat.id))
+        pass
 
 
 __help__ = """
