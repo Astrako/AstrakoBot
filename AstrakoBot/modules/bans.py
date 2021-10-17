@@ -76,12 +76,18 @@ def ban(update: Update, context: CallbackContext) -> str:
         else:
             message.reply_text("This user has immunity and cannot be banned.")
         return log_message
-    if message.text.startswith("/s"):
+    if message.text.startswith("/s") or message.text.startswith("!s"):
         silent = True
         if not can_delete(chat, context.bot.id):
             return ""
     else:
         silent = False
+    if message.text.startswith("/d") or message.text.startswith("!d"):
+        delban = True
+        if not can_delete(chat, context.bot.id):
+            return ""
+    else:
+        delban = False
     log = (
         f"<b>{html.escape(chat.title)}:</b>\n"
         f"#{'S' if silent else ''}BANNED\n"
@@ -98,6 +104,10 @@ def ban(update: Update, context: CallbackContext) -> str:
             if message.reply_to_message:
                 message.reply_to_message.delete()
             message.delete()
+            return log
+        if delban:
+            if message.reply_to_message:
+                message.reply_to_message.delete()
             return log
 
         reply = (
@@ -392,13 +402,14 @@ __help__ = """
 *Admins only:*
  • `/ban <userhandle>`*:* bans a user. (via handle, or reply)
  • `/sban <userhandle>`*:* Silently ban a user. Deletes command, Replied message and doesn't reply. (via handle, or reply)
+ • `/dban <userhandle>`*:* bans a user deleting the replied to message. (via handle, or reply)
  • `/tban <userhandle> x(m/h/d)`*:* bans a user for `x` time. (via handle, or reply). `m` = `minutes`, `h` = `hours`, `d` = `days`.
  • `/unban <userhandle>`*:* unbans a user. (via handle, or reply)
  • `/punch <userhandle> <reason>(optional)`*:* Punches a user out of the group, (via handle, or reply)
  • `/kick <userhandle>`*:* same as punch
 """
 
-BAN_HANDLER = DisableAbleCommandHandler(["ban", "sban"], ban, run_async=True)
+BAN_HANDLER = DisableAbleCommandHandler(["ban", "sban", "dban"], ban, run_async=True)
 TEMPBAN_HANDLER = DisableAbleCommandHandler("tban", temp_ban, run_async=True)
 PUNCH_HANDLER = DisableAbleCommandHandler(["punch", "kick"], punch, run_async=True)
 UNBAN_HANDLER = DisableAbleCommandHandler("unban", unban, run_async=True)
