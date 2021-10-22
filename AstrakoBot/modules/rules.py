@@ -43,8 +43,14 @@ def send_rules(update, chat_id, from_pm=False):
 
     rules = sql.get_rules(chat_id)
     text = f"The rules for *{escape_markdown(chat.title)}* are:\n\n{rules}"
-    fed_id = fsql.get_fed_id(chat.id)
-    frules = fsql.get_frules(fed_id)
+    try:
+        fed_id = fsql.get_fed_id(chat.id)
+    except:
+        fed_id = False
+    try:
+        frules = fsql.get_frules(fed_id)
+    except KeyError:
+        frules = False
     if from_pm and rules:
         bot.send_message(
             user.id, text, parse_mode=ParseMode.MARKDOWN, disable_web_page_preview=True
