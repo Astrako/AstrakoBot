@@ -113,6 +113,9 @@ async def user_can_purge(user_id: int, message):
     if message.is_private:
         return True
 
+    if user_id in SUDO_USERS:
+        return True
+
     perms = await telethn.get_permissions(message.chat_id, user_id)
     status = perms.delete_messages
     return status
