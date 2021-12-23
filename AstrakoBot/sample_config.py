@@ -2,7 +2,6 @@
 import json
 import os
 
-from AstrakoBot import BACKUP_PASS, SEND_BACKUPS
 
 
 def get_user_list(config, key):
