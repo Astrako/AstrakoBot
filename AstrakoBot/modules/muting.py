@@ -121,10 +121,10 @@ def unmute(update: Update, context: CallbackContext) -> str:
 
     if member.status != "kicked" and member.status != "left":
         if (
-            member.can_send_messages
-            and member.can_send_media_messages
-            and member.can_send_other_messages
-            and member.can_add_web_page_previews
+            member.can_send_messages is not False
+            and member.can_send_media_messages is not False
+            and member.can_send_other_messages is not False
+            and member.can_add_web_page_previews is not False
         ):
             message.reply_text("This user already has the right to speak.")
         else:
