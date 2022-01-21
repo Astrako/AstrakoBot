@@ -87,6 +87,12 @@ def gban(update: Update, context: CallbackContext):
         )
         return
 
+    if not reason:
+        message.reply_text(
+            "You must provide a reason!"
+        )
+        return
+
     if int(user_id) in DEV_USERS:
         message.reply_text("This is a developer user\nI can't act against our own.")
         return
