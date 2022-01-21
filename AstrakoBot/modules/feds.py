@@ -592,6 +592,12 @@ def fed_ban(update: Update, context: CallbackContext):
         message.reply_text("You don't seem to be referring to a user")
         return
 
+    if not reason:
+        message.reply_text(
+            "You must provide a reason!"
+        )
+        return
+
     if user_id == bot.id:
         message.reply_text(
             "What is funnier than kicking the group creator? Self sacrifice."
