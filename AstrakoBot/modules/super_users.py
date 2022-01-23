@@ -133,9 +133,13 @@ def addsupport(
         data = json.load(infile)
 
     if user_id in SUDO_USERS:
-        rt += "Demoted from sudo to support user"
-        data["sudos"].remove(user_id)
-        SUDO_USERS.remove(user_id)
+        if user.id in DEV_USERS:
+            rt += "Demoted from sudo to support user"
+            data["sudos"].remove(user_id)
+            SUDO_USERS.remove(user_id)
+        else:
+            message.reply_text("This user is already sudo")
+            return ""
 
     if user_id in SUPPORT_USERS:
         message.reply_text("This user is already sudo")
@@ -188,9 +192,13 @@ def addwhitelist(update: Update, context: CallbackContext) -> str:
         data = json.load(infile)
 
     if user_id in SUDO_USERS:
-        rt += "Demoted from sudo to whitelist user"
-        data["sudos"].remove(user_id)
-        SUDO_USERS.remove(user_id)
+        if user.id in DEV_USERS:
+            rt += "Demoted from sudo to whitelist user"
+            data["sudos"].remove(user_id)
+            SUDO_USERS.remove(user_id)
+        else:
+            message.reply_text("This user is already sudo")
+            return ""
 
     if user_id in SUPPORT_USERS:
         rt += "Demoted from support user to whitelist user"
