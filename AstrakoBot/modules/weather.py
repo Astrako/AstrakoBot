@@ -125,6 +125,33 @@ def weather(update: Update, context: CallbackContext):
                 )
                 return xx
 
+            ## AirQuality
+            air_url = f"http://api.openweathermap.org/data/2.5/air_pollution?lat={latitude}&lon={longitude}&appid={APPID}"
+            air_data = json.loads(get(air_url).text)
+
+            into_dicts = air_data['list'][0]          
+            air_qi = into_dicts['main']
+            aqi = int(air_qi['aqi'])
+
+
+            ## Pollutant concentration 
+            # airinfo = into_dicts['components'] 
+            # components_co   = airinfo["co"]
+            # components_no   = airinfo["no"]
+
+
+            def air_qual(aqin):
+                if aqin == 1:
+                    return "Good"
+                elif aqin == 2:
+                    return "Fair"
+                elif aqin == 3:
+                    return 'Moderate'                
+                elif aqin == 4:
+                    return  'Poor'
+                elif aqin == 5:
+                    return "Very Poor"
+         
             msg = f"*{cityname}, {fullc_n}*\n"
             msg += f"`Longitude: {longitude}`\n"
             msg += f"`Latitude: {latitude}`\n\n"
@@ -135,8 +162,9 @@ def weather(update: Update, context: CallbackContext):
             msg += f"• **Humidity:** `{humidity}%`\n"
             msg += f"• **Wind:** `{kmph[0]} km/h`\n"
             msg += f"• **Sunrise**: `{sun(sunrise)}`\n"
-            msg += f"• **Sunset**: `{sun(sunset)}`"
-        
+            msg += f"• **Sunset**: `{sun(sunset)}`\n"
+            msg += f"• **Air Quality**: `{air_qual(aqi)}`"
+            
     else:
         msg =  "Please specify a city or country"
             
