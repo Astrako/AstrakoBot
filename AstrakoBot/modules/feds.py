@@ -18,6 +18,7 @@ from AstrakoBot import (
     dispatcher,
 )
 from AstrakoBot.modules.disable import DisableAbleCommandHandler
+from AstrakoBot.modules.helper_funcs.admin_status import get_bot_member, user_is_admin
 from AstrakoBot.modules.helper_funcs.alternate import send_message
 from AstrakoBot.modules.helper_funcs.chat_status import (
     is_user_admin,
@@ -2355,37 +2356,45 @@ def is_user_fed_owner(fed_id, user_id):
         return False
 
 
-def enforce_fed(update: Update, _: CallbackContext):
+def enforce_fed(update: Update, ctx: CallbackContext):
     chat = update.effective_chat
     user = update.effective_user
     msg = update.effective_message
     fed_id = sql.get_fed_id(chat.id)
+
+    if not get_bot_member(chat.id).can_restrict_members:
+        sql.chat_leave_fed(chat.id)
+        ctx.bot.send_message(
+            chat.id,
+            "I don't have rights to restrict users on this chat, left fed!",
+        )
+        return
+
     fban, fbanreason, fbantime = sql.get_fban_user(fed_id, user.id)
     if not fban:
         return
 
-    if user and not is_user_admin(chat, user.id):
-        check_and_ban(update, user.id. fbanreason)
-        return
+    if user and not user_is_admin(chat, user.id):
+        check_and_ban(update, user.id, fbanreason)
 
     if msg.new_chat_members:
         new_members = update.effective_message.new_chat_members
         for mem in new_members:
-            check_and_ban(update, mem.id. fbanreason)
+            check_and_ban(update, mem.id, fbanreason)
 
     if msg.reply_to_message:
         user = msg.reply_to_message.from_user
-        if user and not is_user_admin(chat, user.id):
-            check_and_ban(update, user.id. fbanreason)
+        if user and not user_is_admin(chat, user.id):
+            check_and_ban(update, user.id, fbanreason)
 
 
 def check_and_ban(update, chat: Chat, user_id: int, reason: str):
-    update.effective_message.reply_text(
-        f"This user is banned in the current federation! I will remove him.\n{'Reason: {}'.format(reason) if reason else ''}",
-            allow_sending_without_reply = True
-    )
     try:
         chat.ban_member(user_id)
+        update.effective_message.reply_text(
+            f"This user is banned in the current federation! I will remove him.\n{'Reason: {}'.format(reason) if reason else ''}",
+                allow_sending_without_reply = True
+        )
     except:
         pass
 
