@@ -2375,17 +2375,17 @@ def enforce_fed(update: Update, ctx: CallbackContext):
         return
 
     if user and not user_is_admin(chat, user.id):
-        check_and_ban(update, user.id, fbanreason)
+        check_and_ban(update, chat, user.id, fbanreason)
 
     if msg.new_chat_members:
         new_members = update.effective_message.new_chat_members
         for mem in new_members:
-            check_and_ban(update, mem.id, fbanreason)
+            check_and_ban(update, chat, mem.id, fbanreason)
 
     if msg.reply_to_message:
         user = msg.reply_to_message.from_user
         if user and not user_is_admin(chat, user.id):
-            check_and_ban(update, user.id, fbanreason)
+            check_and_ban(update, chat, user.id, fbanreason)
 
 
 def check_and_ban(update, chat: Chat, user_id: int, reason: str):
