@@ -757,6 +757,13 @@ def fed_ban(update: Update, context: CallbackContext):
         for fedschat in fed_chats:
             if fedschat not in common_chats:
                 continue
+            if not get_bot_member(fedschat).can_restrict_members:
+                sql.chat_leave_fed(fedschat)
+                bot.send_message(
+                        chat.id,
+                        "I don't have rights to restrict users on this chat, left fed!",
+                )
+                continue
             try:
                 # Do not spam all fed chats
                 """
@@ -820,6 +827,13 @@ def fed_ban(update: Update, context: CallbackContext):
                 for fedschat in all_fedschat:
                     if fedsid not in common_chats:
                         continue
+                    if not get_bot_member(fedschat).can_restrict_members:
+                        sql.chat_leave_fed(fedschat)
+                        bot.send_message(
+                                chat.id,
+                                "I don't have rights to restrict users on this chat, left fed!",
+                        )
+                        continue
                     try:
                         bot.ban_chat_member(fedschat, fban_user_id)
                     except BadRequest as excp:
@@ -850,7 +864,7 @@ def fed_ban(update: Update, context: CallbackContext):
                     except TelegramError as e:
                         LOGGER.debug(
                                 "fban error, (TelegramError)\nUnable to fban user {} in fed {} in chat {} \n\nreason: {}".format(
-                                        fban_user_id, fed_id, chat.id, str(excp))
+                                        fban_user_id, fed_id, chat.id, str(e))
                         )
                         pass
                     except Exception as e:
@@ -953,12 +967,19 @@ def fed_ban(update: Update, context: CallbackContext):
                 ),
                 parse_mode="HTML",
             )
-    chats_in_fed = 0
+    # chats_in_fed = 0
     common_chats = get_user_com_chats(fban_user_id)
     for fedschat in fed_chats:
         if fedschat not in common_chats:
             continue
-        chats_in_fed += 1
+        if not get_bot_member(fedschat).can_restrict_members:
+            sql.chat_leave_fed(fedschat)
+            bot.send_message(
+                    chat.id,
+                    "I don't have rights to restrict users on this chat, left fed!",
+            )
+            continue
+        # chats_in_fed += 1
         try:
             # Do not spamming all fed chats
             """
@@ -978,7 +999,7 @@ def fed_ban(update: Update, context: CallbackContext):
                         "fban error\nUnable to fban user {} in fed {} in chat {} \n\nreason: {}".format(
                                 fban_user_id, fed_id, chat.id, str(excp))
                 )
-                break
+                # break
             else:
                 LOGGER.warning(
                         "Couldn't fban user {} in fed {} in chat {} \n\nreason: {}".format(fban_user_id, fed_id,
@@ -1007,52 +1028,59 @@ def fed_ban(update: Update, context: CallbackContext):
 							html=True)
 		"""
 
-        # Fban for fed subscriber
-        subscriber = list(sql.get_subscriber(fed_id))
-        if len(subscriber) != 0:
-            for fedsid in subscriber:
-                all_fedschat = sql.all_fed_chats(fedsid)
-                for fedschat in all_fedschat:
-                    if fedsid not in common_chats:
-                        continue
-                    try:
-                        bot.ban_chat_member(fedschat, fban_user_id)
-                    except BadRequest as excp:
-                        if excp.message in FBAN_ERRORS:
-                            try:
-                                dispatcher.bot.getChat(fedschat)
-                            except Unauthorized:
-                                targetfed_id = sql.get_fed_id(fedschat)
-                                sql.unsubs_fed(fed_id, targetfed_id)
-                                LOGGER.info(
-                                    "Chat {} has unsubbed from the fed {} because I was kicked".format(
-                                        fedschat, info["fname"]
-                                    )
-                                )
-                                continue
-                        elif excp.message == "User_id_invalid":
-                            LOGGER.debug(
-                                    "fban error\nUnable to fban user {} in fed {} in chat {} \n\nreason: {}".format(
-                                            fban_user_id, fed_id, chat.id, str(excp))
-                            )
-                            break
-                        else:
-                            LOGGER.warning(
-                                "Unable to execute fban on {} because: {}".format(
-                                    fedschat, excp.message
+    # Fban for fed subscriber
+    subscriber = list(sql.get_subscriber(fed_id))
+    if len(subscriber) != 0:
+        for fedsid in subscriber:
+            all_fedschat = sql.all_fed_chats(fedsid)
+            for fedschat in all_fedschat:
+                if fedsid not in common_chats:
+                    continue
+                if not get_bot_member(fedschat).can_restrict_members:
+                    sql.chat_leave_fed(fedschat)
+                    bot.send_message(
+                            chat.id,
+                            "I don't have rights to restrict users on this chat, left fed!",
+                    )
+                    continue
+                try:
+                    bot.ban_chat_member(fedschat, fban_user_id)
+                except BadRequest as excp:
+                    if excp.message in FBAN_ERRORS:
+                        try:
+                            dispatcher.bot.getChat(fedschat)
+                        except Unauthorized:
+                            targetfed_id = sql.get_fed_id(fedschat)
+                            sql.unsubs_fed(fed_id, targetfed_id)
+                            LOGGER.info(
+                                "Chat {} has unsubbed from the fed {} because I was kicked".format(
+                                    fedschat, info["fname"]
                                 )
                             )
-                    except TelegramError as e:
+                            continue
+                    elif excp.message == "User_id_invalid":
                         LOGGER.debug(
-                                "fban error, (TelegramError)\nUnable to fban user {} in fed {} in chat {} \n\nreason: {}".format(
-                                        fban_user_id, fed_id, chat.id, str(e))
-                        )
-                        pass
-                    except Exception as e:
-                        LOGGER.warning(
                                 "fban error\nUnable to fban user {} in fed {} in chat {} \n\nreason: {}".format(
-                                    fban_user_id, fed_id, chat.id, str(e))
+                                        fban_user_id, fed_id, chat.id, str(excp))
                         )
+                        break
+                    else:
+                        LOGGER.warning(
+                            "Unable to execute fban on {} because: {}".format(
+                                fedschat, excp.message
+                            )
+                        )
+                except TelegramError as e:
+                    LOGGER.debug(
+                            "fban error, (TelegramError)\nUnable to fban user {} in fed {} in chat {} \n\nreason: {}".format(
+                                    fban_user_id, fed_id, chat.id, str(e))
+                    )
+                    pass
+                except Exception as e:
+                    LOGGER.warning(
+                            "fban error\nUnable to fban user {} in fed {} in chat {} \n\nreason: {}".format(
+                                fban_user_id, fed_id, chat.id, str(e))
+                    )
     # if chats_in_fed == 0:
     #    send_message(update.effective_message, "Fedban affected 0 chats. ")
     # elif chats_in_fed > 0:
@@ -2370,22 +2398,28 @@ def enforce_fed(update: Update, ctx: CallbackContext):
         )
         return
 
-    fban, fbanreason, fbantime = sql.get_fban_user(fed_id, user.id)
-    if not fban:
-        return
-
     if user and not user_is_admin(chat, user.id):
-        check_and_ban(update, chat, user.id, fbanreason)
+        fban, fbanreason, fbantime = sql.get_fban_user(fed_id, user.id)
+        if fban:
+            check_and_ban(update, chat, user.id, fbanreason)
 
     if msg.new_chat_members:
         new_members = update.effective_message.new_chat_members
         for mem in new_members:
-            check_and_ban(update, chat, mem.id, fbanreason)
+            fban, fbanreason, fbantime = sql.get_fban_user(fed_id, mem.id)
+            if fban:
+                check_and_ban(update, chat, mem.id, fbanreason)
 
-    if msg.reply_to_message:
-        user = msg.reply_to_message.from_user
-        if user and not user_is_admin(chat, user.id):
-            check_and_ban(update, chat, user.id, fbanreason)
+    # this is optional for now because it needs to check if user is in the chat
+    # and I rather not make more requests to tg on every reply
+    # if msg.reply_to_message:
+    #     user = msg.reply_to_message.from_user
+    #     mem = chat.get_member(user.id)
+    #     if mem.status in ["administrator", "creator", "kicked"]:
+    #         return
+    #     fban, fbanreason, fbantime = sql.get_fban_user(fed_id, user.id)
+    #     if fban and user and not user_is_admin(chat, user.id):
+    #         check_and_ban(update, chat, user.id, fbanreason)
 
 
 def check_and_ban(update, chat: Chat, user_id: int, reason: str):
