@@ -15,6 +15,7 @@ from telegram.ext import (
 from telegram.utils.helpers import mention_html
 
 import AstrakoBot.modules.sql.global_bans_sql as sql
+from AstrakoBot.modules.helper_funcs.admin_status import get_bot_member, user_is_admin
 from AstrakoBot.modules.sql.users_sql import get_user_com_chats
 from AstrakoBot import (
     DEV_USERS,
@@ -447,33 +448,29 @@ def check_and_ban(update, user_id, should_message=True):
             update.effective_message.reply_text(text, parse_mode=ParseMode.HTML)
 
 
-def enforce_gban(update: Update, context: CallbackContext):
-    # Not using @restrict handler to avoid spamming - just ignore if cant gban.
-    bot = context.bot
-    try:
-        restrict_permission = update.effective_chat.get_member(
-            bot.id
-        ).can_restrict_members
-    except Unauthorized:
+def enforce_gban(update: Update, _: CallbackContext):
+    chat = update.effective_chat
+    if not get_bot_member(chat.id).can_restrict_members:
         return
-    if sql.does_chat_gban(update.effective_chat.id) and restrict_permission:
-        user = update.effective_user
-        chat = update.effective_chat
-        msg = update.effective_message
 
-        if user and not is_user_admin(chat, user.id):
-            check_and_ban(update, user.id)
-            return
+    if not sql.does_chat_gban(update.effective_chat.id):
+        return
 
-        if msg.new_chat_members:
-            new_members = update.effective_message.new_chat_members
-            for mem in new_members:
-                check_and_ban(update, mem.id)
+    user = update.effective_user
+    msg = update.effective_message
 
-        if msg.reply_to_message:
-            user = msg.reply_to_message.from_user
-            if user and not is_user_admin(chat, user.id):
-                check_and_ban(update, user.id, should_message=False)
+    if user and not user_is_admin(chat, user.id):
+        check_and_ban(update, user.id)
+
+    if msg.new_chat_members:
+        new_members = update.effective_message.new_chat_members
+        for mem in new_members:
+            check_and_ban(update, mem.id)
+
+    if msg.reply_to_message:
+        user = msg.reply_to_message.from_user
+        if user and not user_is_admin(chat, user.id):
+            check_and_ban(update, user.id, should_message=False)
 
 
 @user_admin
