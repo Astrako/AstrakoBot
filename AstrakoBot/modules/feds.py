@@ -30,7 +30,7 @@ from AstrakoBot.modules.helper_funcs.extraction import (
 )
 from AstrakoBot.modules.helper_funcs.string_handling import markdown_parser
 from telegram import (
-    InlineKeyboardButton,
+    Chat, InlineKeyboardButton,
     InlineKeyboardMarkup,
     MessageEntity,
     ParseMode,
@@ -41,7 +41,7 @@ from telegram.ext import (
     CallbackContext,
     CallbackQueryHandler,
     CommandHandler,
-    run_async,
+    Filters, MessageHandler, run_async,
 )
 from telegram.utils.helpers import mention_html, mention_markdown
 
@@ -1057,7 +1057,7 @@ def fed_ban(update: Update, context: CallbackContext):
     # elif chats_in_fed > 0:
     #    send_message(update.effective_message,
     #                 "Fedban affected {} chats. ".format(chats_in_fed))
-    
+
         if silent:
             try:
                 if message.reply_to_message:
@@ -2355,21 +2355,40 @@ def is_user_fed_owner(fed_id, user_id):
         return False
 
 
-# There's no handler for this yet, but updating for v12 in case its used
-def welcome_fed(update: Update, context: CallbackContext):
-    bot, args = context.bot, context.args
+def enforce_fed(update: Update, _: CallbackContext):
     chat = update.effective_chat
     user = update.effective_user
+    msg = update.effective_message
     fed_id = sql.get_fed_id(chat.id)
     fban, fbanreason, fbantime = sql.get_fban_user(fed_id, user.id)
-    if fban:
-        update.effective_message.reply_text(
-            "This user is banned in the current federation! I will remove him."
-        )
-        bot.ban_chat_member(chat.id, user.id)
-        return True
-    else:
-        return False
+    if not fban:
+        return
+
+    if user and not is_user_admin(chat, user.id):
+        check_and_ban(update, user.id. fbanreason)
+        return
+
+    if msg.new_chat_members:
+        new_members = update.effective_message.new_chat_members
+        for mem in new_members:
+            check_and_ban(update, mem.id. fbanreason)
+
+    if msg.reply_to_message:
+        user = msg.reply_to_message.from_user
+        if user and not is_user_admin(chat, user.id):
+            check_and_ban(update, user.id. fbanreason)
+
+
+def check_and_ban(update, chat: Chat, user_id: int, reason: str):
+    update.effective_message.reply_text(
+        f"This user is banned in the current federation! I will remove him.\n{'Reason: {}'.format(reason) if reason else ''}",
+            allow_sending_without_reply = True
+    )
+    try:
+        chat.ban_member(user_id)
+    except:
+        pass
+
 
 
 def __stats__():
@@ -2512,6 +2531,8 @@ DELETEBTN_FED_HANDLER = CallbackQueryHandler(del_fed_button, pattern=r"rmfed_", 
 FED_OWNER_HELP_HANDLER = CommandHandler("fedownerhelp", fed_owner_help, run_async=True)
 FED_ADMIN_HELP_HANDLER = CommandHandler("fedadminhelp", fed_admin_help, run_async=True)
 FED_USER_HELP_HANDLER = CommandHandler("feduserhelp", fed_user_help, run_async=True)
+FBAN_ENFORCE = MessageHandler(Filters.all & Filters.chat_type.groups, enforce_fed, run_async=True)
+
 
 dispatcher.add_handler(NEW_FED_HANDLER)
 dispatcher.add_handler(DEL_FED_HANDLER)
@@ -2543,3 +2564,4 @@ dispatcher.add_handler(DELETEBTN_FED_HANDLER)
 dispatcher.add_handler(FED_OWNER_HELP_HANDLER)
 dispatcher.add_handler(FED_ADMIN_HELP_HANDLER)
 dispatcher.add_handler(FED_USER_HELP_HANDLER)
+dispatcher.add_handler(FBAN_ENFORCE, 20)
