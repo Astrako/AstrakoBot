@@ -2,7 +2,7 @@ from threading import RLock
 
 from cachetools import TTLCache
 
-from telegram import ChatMember, TelegramError, Update
+from telegram import Chat, ChatMember, TelegramError, Update
 from telegram.ext import CallbackContext, ChatMemberHandler
 
 from AstrakoBot import SUDO_USERS, dispatcher
@@ -21,8 +21,7 @@ def get_bot_member(chat_id: int) -> ChatMember:
 		return mem
 
 
-def user_is_admin(update: Update, user_id: int) -> bool:
-	chat = update.effective_chat
+def user_is_admin(chat: Chat, user_id: int) -> bool:
 	if chat.type == "private" or user_id in SUDO_USERS:
 		return True
 
