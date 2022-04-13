@@ -660,7 +660,9 @@ def main():
 
     else:
         LOGGER.info("Using long polling.")
-        updater.start_polling(timeout=15, read_latency=4, drop_pending_updates=True)
+        allowed_updates = ['message', 'edited_message', 'callback_query', 'callback_query', 'my_chat_member',
+                           'chat_member', 'chat_join_request', 'channel_post', 'edited_channel_post', 'inline_query']
+        updater.start_polling(timeout=15, read_latency=4, drop_pending_updates=True, allowed_updates = allowed_updates)
 
     if len(argv) not in (1, 3, 4):
         telethn.disconnect()
