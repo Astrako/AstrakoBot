@@ -2362,7 +2362,7 @@ def enforce_fed(update: Update, ctx: CallbackContext):
     msg = update.effective_message
     fed_id = sql.get_fed_id(chat.id)
 
-    if not get_bot_member(chat.id).can_restrict_members:
+    if fed_id and not get_bot_member(chat.id).can_restrict_members:
         sql.chat_leave_fed(chat.id)
         ctx.bot.send_message(
             chat.id,
