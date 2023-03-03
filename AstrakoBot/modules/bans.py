@@ -25,6 +25,7 @@ from AstrakoBot.modules.helper_funcs.chat_status import (
     user_admin,
     user_can_ban,
     can_delete,
+    is_bot_admin,
 )
 from AstrakoBot.modules.helper_funcs.extraction import extract_user_and_text
 from AstrakoBot.modules.helper_funcs.string_handling import extract_time
@@ -353,11 +354,8 @@ def unban(update: Update, context: CallbackContext) -> str:
     return log
 
 
-@connection_status
-@bot_admin
-@can_restrict
 @gloggable
-def selfunban(context: CallbackContext, update: Update) -> str:
+def selfunban(update: Update, context: CallbackContext) -> str:
     message = update.effective_message
     user = update.effective_user
     bot, args = context.bot, context.args
@@ -370,7 +368,19 @@ def selfunban(context: CallbackContext, update: Update) -> str:
         message.reply_text("Give a valid chat ID.")
         return
 
-    chat = bot.getChat(chat_id)
+    try:
+        chat = bot.getChat(chat_id)
+    except:
+        message.reply_text("It doesn't look like I'm listed as a member of this chat.")
+        return
+
+    if (chat.type == "private"):
+        message.reply_text("How am i going to unban you from a private chat?")
+        return
+
+    if not is_bot_admin(chat, bot.id):
+        message.reply_text("I'm sorry but i am not an admin there!")
+        return
 
     try:
         member = chat.get_member(user.id)
