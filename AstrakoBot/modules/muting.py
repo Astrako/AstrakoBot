@@ -8,6 +8,7 @@ from AstrakoBot.modules.helper_funcs.chat_status import (
     connection_status,
     is_user_admin,
     user_admin,
+    can_delete,
 )
 from AstrakoBot.modules.helper_funcs.extraction import (
     extract_user,
@@ -65,6 +66,12 @@ def mute(update: Update, context: CallbackContext) -> str:
     user_id, reason = extract_user_and_text(message, args)
     reply = check_user(user_id, bot, chat)
 
+    silent = False
+    if message.text.startswith("/s") or message.text.startswith("!s"):
+        silent = True
+        if not can_delete(chat, context.bot.id):
+            return ""
+
     if reply:
         message.reply_text(reply)
         return ""
@@ -84,18 +91,24 @@ def mute(update: Update, context: CallbackContext) -> str:
     if member.can_send_messages is None or member.can_send_messages:
         chat_permissions = ChatPermissions(can_send_messages=False)
         bot.restrict_chat_member(chat.id, user_id, chat_permissions)
-        reply = (
-            f"<code>❕</code><b>Mute Event</b>\n"
-            f"<code> </code><b>•  User:</b> {mention_html(member.user.id, html.escape(member.user.first_name))}\n"
-            f"<code> </code><b>•  Time: no expiration date</b>"
-        )
-        if reason:
-            reply += f"\n<code> </code><b>•  Reason:</b> {html.escape(reason)}"
-        bot.sendMessage(chat.id, reply, parse_mode=ParseMode.HTML)
+        if not silent:
+            reply = (
+                f"<code>❕</code><b>Mute Event</b>\n"
+                f"<code> </code><b>•  User:</b> {mention_html(member.user.id, html.escape(member.user.first_name))}\n"
+                f"<code> </code><b>•  Time: no expiration date</b>"
+            )
+            if reason:
+                reply += f"\n<code> </code><b>•  Reason:</b> {html.escape(reason)}"
+            bot.sendMessage(chat.id, reply, parse_mode=ParseMode.HTML)
+        else:
+            message.delete()
         return log
 
     else:
-        message.reply_text("This user is already muted!")
+        if not silent:
+            message.reply_text("This user is already muted!")
+        else:
+            message.delete()
 
     return ""
 
@@ -110,11 +123,20 @@ def unmute(update: Update, context: CallbackContext) -> str:
     user = update.effective_user
     message = update.effective_message
 
+    silent = False
+    if message.text.startswith("/s") or message.text.startswith("!s"):
+        silent = True
+        if not can_delete(chat, context.bot.id):
+            return ""
+
     user_id = extract_user(message, args)
     if not user_id:
-        message.reply_text(
-            "You'll need to either give me a username to unmute, or reply to someone to be unmuted."
-        )
+        if silent:
+            message.delete()
+        else:
+            message.reply_text(
+                "You'll need to either give me a username to unmute, or reply to someone to be unmuted."
+            )
         return ""
 
     member = chat.get_member(int(user_id))
@@ -126,7 +148,8 @@ def unmute(update: Update, context: CallbackContext) -> str:
             and member.can_send_other_messages is not False
             and member.can_add_web_page_previews is not False
         ):
-            message.reply_text("This user already has the right to speak.")
+            if not silent:
+                message.reply_text("This user already has the right to speak.")
         else:
             chat_permissions = ChatPermissions(
                 can_send_messages=True,
@@ -142,11 +165,14 @@ def unmute(update: Update, context: CallbackContext) -> str:
                 bot.restrict_chat_member(chat.id, int(user_id), chat_permissions)
             except BadRequest:
                 pass
-            bot.sendMessage(
-                chat.id,
-                f"I shall allow <b>{html.escape(member.user.first_name)}</b> to text!",
-                parse_mode=ParseMode.HTML,
-            )
+            if not silent:
+                bot.sendMessage(
+                    chat.id,
+                    f"I shall allow <b>{html.escape(member.user.first_name)}</b> to text!",
+                    parse_mode=ParseMode.HTML,
+                )
+            else:
+                message.delete()
             return (
                 f"<b>{html.escape(chat.title)}:</b>\n"
                 f"#UNMUTE\n"
@@ -154,11 +180,14 @@ def unmute(update: Update, context: CallbackContext) -> str:
                 f"<b>User:</b> {mention_html(member.user.id, member.user.first_name)}"
             )
     else:
-        message.reply_text(
-            "This user isn't even in the chat, unmuting them won't make them talk more than they "
-            "already do!"
-        )
+        if not silent:
+            message.reply_text(
+                "This user isn't even in the chat, unmuting them won't make them talk more than they "
+                "already do!"
+            )
 
+    if silent:
+        message.delete()
     return ""
 
 
@@ -176,6 +205,12 @@ def temp_mute(update: Update, context: CallbackContext) -> str:
     user_id, reason = extract_user_and_text(message, args)
     reply = check_user(user_id, bot, chat)
 
+    silent = False
+    if message.text.startswith("/s") or message.text.startswith("!s"):
+        silent = True
+        if not can_delete(chat, context.bot.id):
+            return ""
+
     if reply:
         message.reply_text(reply)
         return ""
@@ -183,7 +218,10 @@ def temp_mute(update: Update, context: CallbackContext) -> str:
     member = chat.get_member(user_id)
 
     if not reason:
-        message.reply_text("You haven't specified a time to mute this user for!")
+        if not silent:
+            message.reply_text("You haven't specified a time to mute this user for!")
+        else:
+            message.delete()
         return ""
 
     split_reason = reason.split(None, 1)
@@ -215,22 +253,31 @@ def temp_mute(update: Update, context: CallbackContext) -> str:
             bot.restrict_chat_member(
                 chat.id, user_id, chat_permissions, until_date=mutetime
             )
-            reply = (
-                f"<code>❕</code><b>Mute Event</b>\n"
-                f"<code> </code><b>•  User:</b> {mention_html(member.user.id, html.escape(member.user.first_name))}\n"
-                f"<code> </code><b>•  Time: {time_val}</b>"
-            )
-            if reason:
-                reply += f"\n<code> </code><b>•  Reason:</b> {html.escape(reason)}"
-            bot.sendMessage(chat.id, reply, parse_mode=ParseMode.HTML)
+            if not silent:
+                reply = (
+                    f"<code>❕</code><b>Mute Event</b>\n"
+                    f"<code> </code><b>•  User:</b> {mention_html(member.user.id, html.escape(member.user.first_name))}\n"
+                    f"<code> </code><b>•  Time: {time_val}</b>"
+                )
+                if reason:
+                    reply += f"\n<code> </code><b>•  Reason:</b> {html.escape(reason)}"
+                bot.sendMessage(chat.id, reply, parse_mode=ParseMode.HTML)
+            else:
+                message.delete()
             return log
         else:
-            message.reply_text("This user is already muted.")
+            if not silent:
+                message.reply_text("This user is already muted.")
+            else:
+                message.delete()
 
     except BadRequest as excp:
         if excp.message == "Reply message not found":
             # Do not reply
-            message.reply_text(f"Muted for {time_val}!", quote=False)
+            if not silent:
+                message.reply_text(f"Muted for {time_val}!", quote=False)
+            else:
+                message.delete()
             return log
         else:
             LOGGER.warning(update)
@@ -241,7 +288,10 @@ def temp_mute(update: Update, context: CallbackContext) -> str:
                 chat.id,
                 excp.message,
             )
-            message.reply_text("Well damn, I can't mute that user.")
+            if not silent:
+                message.reply_text("Well damn, I can't mute that user.")
+            else:
+                message.delete()
 
     return ""
 
@@ -253,9 +303,9 @@ __help__ = """
  • `/unmute <userhandle>`*:* unmutes a user. Can also be used as a reply, muting the replied to user.
 """
 
-MUTE_HANDLER = CommandHandler("mute", mute, run_async=True)
-UNMUTE_HANDLER = CommandHandler("unmute", unmute, run_async=True)
-TEMPMUTE_HANDLER = CommandHandler(["tmute", "tempmute"], temp_mute, run_async=True)
+MUTE_HANDLER = CommandHandler(["mute", "smute"], mute, run_async=True)
+UNMUTE_HANDLER = CommandHandler(["unmute", "sunmute"], unmute, run_async=True)
+TEMPMUTE_HANDLER = CommandHandler(["tmute", "tempmute", "stmute", "stempmute"], temp_mute, run_async=True)
 
 dispatcher.add_handler(MUTE_HANDLER)
 dispatcher.add_handler(UNMUTE_HANDLER)
