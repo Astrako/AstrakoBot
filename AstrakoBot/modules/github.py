@@ -60,7 +60,7 @@ def getphh(index):
 # do not async
 def getData(url, index):
     if not api.getData(url):
-        return "Invalid <user>/<repo> combo"
+        return "Invalid <user>/<repo> combo.\nAre you sure this repository has a release file?"
     recentRelease = api.getReleaseData(api.getData(url), index)
     if recentRelease is None:
         return "The specified release could not be found"
