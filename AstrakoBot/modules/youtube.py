@@ -1,173 +1,155 @@
-import os, glob, json
-
+import os
+import json
+import random
+import string
 from datetime import datetime
-from AstrakoBot.modules.sql.clear_cmd_sql import get_clearcmd
 from telegram import Bot, Update, ParseMode, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import CommandHandler, CallbackQueryHandler, CallbackContext, run_async
+from AstrakoBot.modules.sql.clear_cmd_sql import get_clearcmd
 from AstrakoBot import dispatcher
 from AstrakoBot.modules.disable import DisableAbleCommandHandler
 from AstrakoBot.modules.helper_funcs.misc import delete
-from youtubesearchpython import VideosSearch
+import pytube
+from moviepy.editor import *
 
-from youtube_dl import YoutubeDL
+def get_random():
+    letters = string.ascii_lowercase
+    return ''.join(random.choice(letters) for i in range(10))
 
+def is_ytl(url):
+    return 'youtube.com/watch?v=' in url or 'youtu.be/' in url
 
-def youtube(update: Update, context: CallbackContext):
-    bot = context.bot
-    message = update.effective_message
-    chat = update.effective_chat
-    yt = message.text[len("/youtube ") :]
-    if yt:
-        search = VideosSearch(yt, limit=1)
-        result = search.result()
+def format_link(youtube_link):
+    if "youtu.be/" in youtube_link:
+        youtube_link = youtube_link.replace('youtu.be/', 'youtube.com/watch?v=')
+    if '&ab_channel' in youtube_link:
+        youtube_link = youtube_link.split('&ab_channel')[0]
+    return youtube_link
 
+def dyt_video(youtube_link, resolution, filename):
+    youtube_link = format_link(youtube_link)
+    youtube = pytube.YouTube(youtube_link)
+
+    # Try to get video length at least 5 times
+    for i in range(5):
         try:
-            url = result["result"][0]["link"]
-            title = result["result"][0]["title"]
+            video_length = youtube.length / 60
+            break
         except:
-            return message.reply_text(
-                "Failed to find song or video",
-            )
-
-        buttons = [
-            [
-                InlineKeyboardButton("🎵", callback_data=f"youtube;audio;{url}"),
-                InlineKeyboardButton("🎥", callback_data=f"youtube;video;{url}"),
-                InlineKeyboardButton("🚫", callback_data=f"youtube;cancel;"""),
-            ]
-        ]
-
-        msg = "*Preparing to upload file:*\n"
-        msg += f"`{title}`\n"
-        delmsg = message.reply_text(
-            msg, 
-            parse_mode=ParseMode.MARKDOWN,            
-            reply_markup = InlineKeyboardMarkup(buttons)
-        )
-
-    else:
-        delmsg = message.reply_text("Specify a song or video"
-        )
-
-    cleartime = get_clearcmd(chat.id, "youtube")
-    
-    if cleartime:
-        context.dispatcher.run_async(delete, delmsg, cleartime.time)
+            if i == 4:
+                return "Could not get video length! Try again in a few seconds or try another video."
 
 
-def youtube_callback(update: Update, context: CallbackContext):
-    bot = context.bot
-    message = update.effective_message
-    chat = update.effective_chat
-    query = update.callback_query
+    if video_length > 10: # 10 minutes limit for video
+        return "Video is longer than 10 minutes! Try again with a shorter one."
 
-    media = query.data.split(";")
-    media_type = media[1]
-    media_url = media[2]
-    
-    if media_type == "audio":
-        deltext = message.edit_text("Processing song...")
-        opts = {
-        "format": "bestaudio/best",
-        "addmetadata": True,
-        "geo_bypass": True,
-        "nocheckcertificate": True,
-        "postprocessors": [
-            {
-                "key": "FFmpegExtractAudio",
-                "preferredcodec": "mp3",
-                "preferredquality": "128",
-            }
-        ],
-        "outtmpl": "%(title)s.%(etx)s",
-        "quiet": True,
-        "logtostderr": False,
-        }
+    video_streams = youtube.streams
+    available_resolutions = [stream.resolution for stream in video_streams if stream.resolution is not None]
+    if resolution not in available_resolutions:
+        resolution = max(available_resolutions, key=lambda x: int(x[:-1]))
 
-        codec = "mp3"
-        
-        with YoutubeDL(opts) as rip:
-            rip_data = rip.extract_info(media_url, download=False, process=False)
-            if int(rip_data['duration'] / 60) < 10:
-                try:
-                    rip_data = rip.extract_info(media_url)
-                    delmsg = bot.send_audio(
-                        chat_id = chat.id,
-                        audio = open(f"{rip_data['title']}.{codec}", "rb"),
-                        duration = int(rip_data['duration']),
-                        title = str(rip_data['title']),
-                        parse_mode = ParseMode.HTML
-                    )
-                    context.dispatcher.run_async(delete, deltext, 0)
-                except:
-                    delmsg = message.edit_text(
-                        "Song is too large for processing, or any other error happened. Try again later"
-                    )
-            else:
-                delmsg = message.edit_text(
-                    "Song is too large for processing. Duration is limited to 10 minutes max"
-                )
+    video_stream = youtube.streams.filter(resolution=resolution, progressive=True).order_by('resolution').desc().first()
+    audio_stream = youtube.streams.filter(only_audio=True).order_by('abr').desc().first()
 
-    elif media_type == "video":
-        deltext = message.edit_text("Processing video...")
-        opts = {
-        "format": "best",
-        "addmetadata": True,
-        "geo_bypass": True,
-        "nocheckcertificate": True,
-        "postprocessors": [
-            {
-                "key": "FFmpegVideoConvertor", 
-                "preferedformat": "mp4",
-            }
-        ],
-        "outtmpl": "%(title)s.mp4",
-        "quiet": True,
-        "logtostderr": False,
-        }
+    video_file = video_stream.download(filename="{}.mp4".format(get_random()))
+    audio_file = audio_stream.download(filename="{}.mp3".format(get_random()))
 
-        codec = "mp4"
-
-        with YoutubeDL(opts) as rip:
-            rip_data = rip.extract_info(media_url, download=False, process=False)
-            if int(rip_data['duration'] / 60) < 10:
-                try:
-                    rip_data = rip.extract_info(media_url)
-                    delmsg = bot.send_video(
-                        chat_id = chat.id,
-                        video = open(f"{rip_data['title']}.{codec}", "rb"),
-                        duration = int(rip_data['duration']),
-                        caption = rip_data['title'],
-                        supports_streaming = True,
-                        parse_mode = ParseMode.HTML
-                    )
-                    context.dispatcher.run_async(delete, deltext, 0)
-                except:
-                    delmsg = message.edit_text(
-                        "Video is too large for processing, or any other error happened. Try again later"
-                    )
-            else:
-                delmsg = message.edit_text(
-                    "Video is too large for processing. Duration is limited to 10 minutes max"
-                )
-    else:
-        delmsg = message.edit_text("Canceling...")
-        context.dispatcher.run_async(delete, delmsg, 1)
+    video_clip = VideoFileClip(video_file)
+    audio_clip = AudioFileClip(audio_file)
+    final_clip = video_clip.set_audio(audio_clip)
+    final_clip.write_videofile(filename, codec='libx264', audio_codec='aac')
 
     try:
-        os.remove(f"{rip_data['title']}.{codec}")
+        os.remove(video_file)
+        os.remove(audio_file)
+    except:
+        pass
+
+    return ""
+
+def dyt_audio(youtube_link, filename):
+    youtube_link = format_link(youtube_link)
+    youtube = YouTube(youtube_link)
+
+    # Try to get video length at least 5 times, even with this, pytube may fail sometimes.
+    for i in range(5):
+        try:
+            video_length = youtube.length / 60
+            break
+        except:
+            if i == 5:
+                return "Could not get video length! Try again in a few seconds or try another video."
+
+    if video_length > 30: # 30 minutes limit for audio
+        return "Audio is longer than 30 minutes! Try again with a shorter one."
+
+    audio_stream = youtube.streams.filter(only_audio=True, abr="128kbps").first()
+
+    try:
+        audio_stream.download(filename=filename)
+    except:
+        return "Unknown Error."
+    return ""
+
+def youtube(update: Update, context: CallbackContext):
+    message_id = update.message.message_id
+    message = update.effective_message
+    chat = update.effective_chat
+    args = context.args
+    chat_id = update.effective_chat.id
+    if not args or not is_ytl(args[0]):
+        message.reply_text("Specify a song or video!")
+        return
+    yt = args[0]
+    avail_res = ["720p", "480p", "360p", "240p", "144p"] # Limit to HD due to file size
+    types = ["video", "audio"]
+    type = "video"
+    res = avail_res[0]
+    for i in types:
+        if i in args:
+            type = i
+            break
+    for i in avail_res:
+        if i in args or i[:-1] in args:
+            res = i
+            if not res.endswith("p"):
+                res += "p"
+            break
+
+    filename = get_random()
+
+    if type == "video":
+        filename += ".mp4"
+        msg = message.reply_text("Downloading as video, Please wait...")
+        ret = dyt_video(yt, res, filename)
+        caption = "Type: mp4\nQuality: {}".format(res)
+        if ret == "":
+            msg.edit_text("Uploading...")
+            with open(filename, "rb") as video:
+                context.bot.send_video(chat_id=chat_id, video=video, caption=caption, reply_to_message_id=message_id)
+            msg.delete()
+        else:
+            msg.edit_text(ret)
+
+    else:
+        filename += ".mp3"
+        msg = message.reply_text("Downloading as mp3 audio, Please wait...")
+        ret = dyt_video(yt, res, filename)
+        caption = "Type: mp3\nQuality: 128kbps".format(res)
+        if ret == "":
+            msg.edit_text("Uploading...")
+            with open(filename, "rb") as audio:
+                context.bot.send_audio(chat_id=chat_id, audio=audio, caption=caption.format(type), reply_to_message_id=message_id)
+            msg.delete()
+        else:
+            msg.edit_text(ret)
+
+    try:
+        os.remove(filename)
     except Exception:
         pass
 
-    cleartime = get_clearcmd(chat.id, "youtube")
-    
-    if cleartime:
-        context.dispatcher.run_async(delete, delmsg, cleartime.time)
-
+    return
 
 YOUTUBE_HANDLER = DisableAbleCommandHandler(["youtube", "yt"], youtube, run_async = True)
-YOUTUBE_CALLBACKHANDLER = CallbackQueryHandler(
-    youtube_callback, pattern="youtube*", run_async=True
-)
 dispatcher.add_handler(YOUTUBE_HANDLER)
-dispatcher.add_handler(YOUTUBE_CALLBACKHANDLER)

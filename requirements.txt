@@ -40,10 +40,9 @@ hachoir
 pybase64
 pySmartDL
 validators
-youtube_dl
-youtube-search-python
 gtts
 pretty_errors
 tswift
 PyYAML
 humanize
+pytube

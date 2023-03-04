@@ -14,7 +14,7 @@ __help__ = """
 *Text to speech:*
  • `/tts <text>`: convert text to speech\n
 *Youtube:*
- • `/youtube`, `/yt` `<song or video name>`: download songs or videos from youtube in standar quality
+ • `/youtube`, `/yt` `<song or video link> [type] [quality]`: download songs or videos from youtube. Quality limit is 720p; Type can be either video or audio.
 """
 
 __mod_name__ = "Media"
