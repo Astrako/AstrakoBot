@@ -394,6 +394,8 @@ def set_warn_limit(update: Update, context: CallbackContext) -> str:
         if args[0].isdigit():
             if int(args[0]) < 3:
                 msg.reply_text("The minimum warn limit is 3!")
+            elif int(args[0]) > 9999:
+                msg.reply_text("Well damn, that's a too big value!")
             else:
                 sql.set_warn_limit(chat.id, int(args[0]))
                 msg.reply_text("Updated the warn limit to {}".format(args[0]))
