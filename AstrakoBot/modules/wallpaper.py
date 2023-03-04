@@ -1,6 +1,6 @@
 from random import randint
 
-import requests as r
+import requests
 from AstrakoBot import SUPPORT_CHAT, WALL_API, dispatcher
 from AstrakoBot.modules.disable import DisableAbleCommandHandler
 from AstrakoBot.modules.sql.clear_cmd_sql import get_clearcmd
@@ -8,8 +8,7 @@ from AstrakoBot.modules.helper_funcs.misc import delete
 from telegram import Update
 from telegram.ext import CallbackContext, run_async
 
-# Wallpapers module by @TheRealPhoenix using wall.alphacoders.com
-
+PIXABAY_API = WALL_API
 
 def wall(update: Update, context: CallbackContext):
     chat_id = update.effective_chat.id
@@ -23,21 +22,20 @@ def wall(update: Update, context: CallbackContext):
         return
     else:
         caption = query
-        term = query.replace(" ", "%20")
-        json_rep = r.get(
-            f"https://wall.alphacoders.com/api2.0/get.php?auth={WALL_API}&method=search&term={term}"
-        ).json()
-        if not json_rep.get("success"):
+        term = query.replace(" ", "+")
+        response = requests.get(f"https://pixabay.com/api/?key={PIXABAY_API}&q={term}&image_type=photo&per_page=200")
+
+        if response.status_code != 200:
             msg.reply_text(f"An error occurred! Report this @{SUPPORT_CHAT}")
         else:
-            wallpapers = json_rep.get("wallpapers")
+            data = response.json()
+            wallpapers = data.get("hits")
             if not wallpapers:
                 msg.reply_text("No results found! Refine your search.")
                 return
             else:
-                index = randint(0, len(wallpapers) - 1)  # Choose random index
-                wallpaper = wallpapers[index]
-                wallpaper = wallpaper.get("url_image")
+                index = randint(0, len(wallpapers) - 1) if len(wallpapers) > 1 else 0
+                wallpaper = wallpapers[index].get("largeImageURL")
                 wallpaper = wallpaper.replace("\\", "")
                 delmsg_preview = bot.send_photo(
                     chat_id,
