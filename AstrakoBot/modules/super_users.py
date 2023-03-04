@@ -146,7 +146,7 @@ def addsupport(
             return ""
 
     if user_id in SUPPORT_USERS:
-        message.reply_text("This user is already sudo")
+        message.reply_text("This user is already support")
         return ""
 
     if user_id in WHITELIST_USERS:
