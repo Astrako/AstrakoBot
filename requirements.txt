@@ -46,3 +46,4 @@ tswift
 PyYAML
 humanize
 pytube
+moviepy
