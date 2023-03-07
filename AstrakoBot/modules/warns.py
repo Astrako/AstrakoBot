@@ -208,6 +208,30 @@ def warn_user(update: Update, context: CallbackContext) -> str:
         message.reply_text("That looks like an invalid User ID to me.")
     return ""
 
+@user_admin
+@bot_admin
+@loggable
+def rm_last_warn(update: Update, context: CallbackContext) -> str:
+    args = context.args
+    message: Optional[Message] = update.effective_message
+    chat: Optional[Chat] = update.effective_chat
+    user: Optional[User] = update.effective_user
+
+    user_id = extract_user(message, args)
+
+    if user_id:
+        sql.remove_warn(user_id, chat.id)
+        message.reply_text("Latest warning has been removed!")
+        unwarned = chat.get_member(user_id).user
+        return (
+            f"<b>{html.escape(chat.title)}:</b>\n"
+            f"#UNWARN\n"
+            f"<b>Admin:</b> {mention_html(user.id, user.first_name)}\n"
+            f"<b>User:</b> {mention_html(unwarned.id, unwarned.first_name)}"
+        )
+    else:
+        message.reply_text("No user has been designated!")
+    return ""
 
 @user_admin
 @bot_admin
@@ -492,6 +516,7 @@ __help__ = """
 *Admins only:*
  • `/warn <userhandle>`*:* warn a user. After 3 warns, the user will be banned from the group. Can also be used as a reply.
  • `/dwarn <userhandle>`*:* warn a user and delete the message. After 3 warns, the user will be banned from the group. Can also be used as a reply.
+ • `/rmwarn`, `/unwarn` `<userhandle>`*:* removes user's latest warning. Can also be used as a reply.
  • `/resetwarn <userhandle>`*:* reset the warns for a user. Can also be used as a reply.
  • `/addwarn <keyword> <reply message>`*:* set a warning filter on a certain keyword. If you want your keyword to \
 be a sentence, encompass it with quotes, as such: `/addwarn "very angry" This is an angry user`.
@@ -503,6 +528,7 @@ be a sentence, encompass it with quotes, as such: `/addwarn "very angry" This is
 __mod_name__ = "Warnings"
 
 WARN_HANDLER = CommandHandler(["warn", "dwarn"], warn_user, filters=Filters.chat_type.groups, run_async=True)
+UNWARN_HANDLER = CommandHandler(["unwarn", "rmwarn"], rm_last_warn, filters=Filters.chat_type.groups, run_async=True)
 RESET_WARN_HANDLER = CommandHandler(
     ["resetwarn", "resetwarns"], reset_warns, filters=Filters.chat_type.groups, run_async=True
 )
@@ -524,6 +550,7 @@ WARN_STRENGTH_HANDLER = CommandHandler(
 )
 
 dispatcher.add_handler(WARN_HANDLER)
+dispatcher.add_handler(UNWARN_HANDLER)
 dispatcher.add_handler(CALLBACK_QUERY_HANDLER)
 dispatcher.add_handler(RESET_WARN_HANDLER)
 dispatcher.add_handler(MYWARNS_HANDLER)
