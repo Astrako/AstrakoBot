@@ -151,11 +151,11 @@ def totranslate(update: Update, context: CallbackContext):
         if reply.document or reply.video or reply.animation or reply.photo:
             if reply.caption:
                 text = reply.caption
-        else:
+        elif reply.text:
             text = reply.text
 
-    if not args or text == "":
-        delmsg = update.effective_message.reply_text(
+    if text == "":
+        delmsg = message.reply_text(
             "Reply to messages from other languages for translating into the intended language\n\n"
             "Example: `/tr en-ml` to translate from English to Malayalam\n"
             "Or use: `/tr ml` for automatic detection and translating it into Malayalam.\n"
@@ -165,7 +165,10 @@ def totranslate(update: Update, context: CallbackContext):
         )
         deletion(update, context, delmsg)
         return
-    if "-" in args[0]:
+    if not args:
+        srcLang = "auto"
+        targetLang = "en" # Default to english if no arguments were given
+    elif "-" in args[0]:
         try:
             srcLang = args[0].split('-')[0]
         except:
