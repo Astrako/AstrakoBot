@@ -69,7 +69,7 @@ def dyt_video(youtube_link, resolution, filename):
 
 def dyt_audio(youtube_link, filename):
     youtube_link = format_link(youtube_link)
-    youtube = YouTube(youtube_link)
+    youtube = pytube.YouTube(youtube_link)
 
     # Try to get video length at least 5 times, even with this, pytube may fail sometimes.
     for i in range(5):
@@ -134,7 +134,7 @@ def youtube(update: Update, context: CallbackContext):
     else:
         filename += ".mp3"
         msg = message.reply_text("Downloading as mp3 audio, Please wait...")
-        ret = dyt_video(yt, res, filename)
+        ret = dyt_audio(yt, filename)
         caption = "Type: mp3\nQuality: 128kbps".format(res)
         if ret == "":
             msg.edit_text("Uploading...")
