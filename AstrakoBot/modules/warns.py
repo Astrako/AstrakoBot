@@ -194,6 +194,7 @@ def warn_user(update: Update, context: CallbackContext) -> str:
         if (
             message.reply_to_message
             and message.reply_to_message.from_user.id == user_id
+            and not message.text.startswith("/d")
         ):
             return warn(
                 message.reply_to_message.from_user,
