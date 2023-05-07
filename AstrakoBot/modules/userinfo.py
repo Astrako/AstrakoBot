@@ -58,12 +58,17 @@ def get_id(update: Update, context: CallbackContext):
             )
 
         else:
-
-            user = bot.get_chat(user_id)
-            msg.reply_text(
-                f"{html.escape(user.first_name)}'s id is <code>{user.id}</code>.",
-                parse_mode=ParseMode.HTML,
-            )
+            try:
+                user = bot.get_chat(user_id)
+                msg.reply_text(
+                    f"{html.escape(user.first_name)}'s id is <code>{user.id}</code>.",
+                    parse_mode=ParseMode.HTML,
+                )
+            except:
+                msg.reply_text(
+                    f"Their id is <code>{user_id}</code>.",
+                    parse_mode=ParseMode.HTML,
+                )
 
     else:
 
