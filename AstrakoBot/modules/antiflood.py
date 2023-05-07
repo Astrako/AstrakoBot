@@ -39,8 +39,8 @@ def check_flood(update: Update, context: CallbackContext) -> str:
     if not user:  # ignore channels
         return ""
 
-    # ignore admins and whitelists
-    if is_user_admin(chat, user.id) or user.id in WHITELIST_USERS:
+    # ignore admins, whitelists and telegram's native tech
+    if is_user_admin(chat, user.id) or user.id in WHITELIST_USERS or user.id == 777000:
         sql.update_flood(chat.id, None)
         return ""
     # ignore approved users
