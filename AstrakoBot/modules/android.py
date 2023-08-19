@@ -17,6 +17,9 @@ from AstrakoBot.modules.sql.clear_cmd_sql import get_clearcmd
 from AstrakoBot.modules.github import getphh
 from AstrakoBot.modules.helper_funcs.misc import delete
 
+rget_headers = {
+    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/93.0.4577.63 Safari/537.36"
+}
 
 def magisk(update: Update, context: CallbackContext):
     message = update.effective_message
@@ -55,14 +58,15 @@ def checkfw(update: Update, context: CallbackContext):
         temp, csc = args
         model = f'sm-' + temp if not temp.upper().startswith('SM-') else temp
         fota = get(
-            f'http://fota-cloud-dn.ospserver.net/firmware/{csc.upper()}/{model.upper()}/version.xml'
+            f'https://fota-cloud-dn.ospserver.net/firmware/{csc.upper()}/{model.upper()}/version.xml',
+            headers=rget_headers
         )
 
         if fota.status_code != 200:
             msg = f"Couldn't check for {temp.upper()} and {csc.upper()}, please refine your search or try again later!"
 
         else:
-            page = BeautifulSoup(fota.content, 'lxml')
+            page = BeautifulSoup(fota.content, 'xml')
             os = page.find("latest").get("o")
 
             if page.find("latest").text.strip():
@@ -102,7 +106,8 @@ def getfw(update: Update, context: CallbackContext):
         temp, csc = args
         model = f'sm-' + temp if not temp.upper().startswith('SM-') else temp
         fota = get(
-            f'http://fota-cloud-dn.ospserver.net/firmware/{csc.upper()}/{model.upper()}/version.xml'
+            f'https://fota-cloud-dn.ospserver.net/firmware/{csc.upper()}/{model.upper()}/version.xml',
+            headers=rget_headers
         )
 
         if fota.status_code != 200:
@@ -113,10 +118,7 @@ def getfw(update: Update, context: CallbackContext):
             url2 = f'https://www.sammobile.com/samsung/firmware/{model.upper()}/{csc.upper()}/'
             url3 = f'https://sfirmware.com/samsung-{model.lower()}/#tab=firmwares'
             url4 = f'https://samfw.com/firmware/{model.upper()}/{csc.upper()}/'
-            fota = get(
-                f'http://fota-cloud-dn.ospserver.net/firmware/{csc.upper()}/{model.upper()}/version.xml'
-            )
-            page = BeautifulSoup(fota.content, 'lxml')
+            page = BeautifulSoup(fota.content, 'xml')
             os = page.find("latest").get("o")
             msg = ""
             if page.find("latest").text.strip():
@@ -129,10 +131,10 @@ def getfw(update: Update, context: CallbackContext):
                     msg += f'• Android: `{os}`\n'
             msg += '\n'
             msg += f'*Downloads for {model.upper()} and {csc.upper()}*\n'
-            btn = [[InlineKeyboardButton(text=f"samfrew.com", url = url1)]]
-            btn += [[InlineKeyboardButton(text=f"sammobile.com", url = url2)]]
-            btn += [[InlineKeyboardButton(text=f"sfirmware.com", url = url3)]]
-            btn += [[InlineKeyboardButton(text=f"samfw.com", url = url4)]]
+            btn = [[InlineKeyboardButton(text=f"Samfrew", url = url1)]]
+            btn += [[InlineKeyboardButton(text=f"Sammobile", url = url2)]]
+            btn += [[InlineKeyboardButton(text=f"SFirmware", url = url3)]]
+            btn += [[InlineKeyboardButton(text=f"Samfw (Recommended)", url = url4)]]
     else:
         msg = 'Give me something to fetch, like:\n`/getfw SM-N975F DBT`'
 
