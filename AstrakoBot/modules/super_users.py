@@ -59,6 +59,11 @@ def addsudo(update: Update, context: CallbackContext) -> str:
     chat = update.effective_chat
     bot, args = context.bot, context.args
     user_id = extract_user(message, args)
+
+    if not user_id:
+        message.reply_text("Invalid user!")
+        return ""
+
     user_member = bot.getChat(user_id)
     rt = ""
 
@@ -121,6 +126,11 @@ def addsupport(
     chat = update.effective_chat
     bot, args = context.bot, context.args
     user_id = extract_user(message, args)
+
+    if not user_id:
+        message.reply_text("Invalid user!")
+        return ""
+
     user_member = bot.getChat(user_id)
     rt = ""
 
@@ -184,6 +194,11 @@ def addwhitelist(update: Update, context: CallbackContext) -> str:
     chat = update.effective_chat
     bot, args = context.bot, context.args
     user_id = extract_user(message, args)
+
+    if not user_id:
+        message.reply_text("Invalid user!")
+        return ""
+
     user_member = bot.getChat(user_id)
     rt = ""
 
@@ -247,6 +262,11 @@ def removesudo(update: Update, context: CallbackContext) -> str:
     chat = update.effective_chat
     bot, args = context.bot, context.args
     user_id = extract_user(message, args)
+
+    if not user_id:
+        message.reply_text("Invalid user!")
+        return ""
+
     user_member = bot.getChat(user_id)
 
     reply = check_user_id(user_id, bot)
@@ -293,6 +313,11 @@ def removesupport(update: Update, context: CallbackContext) -> str:
     chat = update.effective_chat
     bot, args = context.bot, context.args
     user_id = extract_user(message, args)
+
+    if not user_id:
+        message.reply_text("Invalid user!")
+        return ""
+
     user_member = bot.getChat(user_id)
 
     reply = check_user_id(user_id, bot)
@@ -335,6 +360,11 @@ def removewhitelist(update: Update, context: CallbackContext) -> str:
     chat = update.effective_chat
     bot, args = context.bot, context.args
     user_id = extract_user(message, args)
+
+    if not user_id:
+        message.reply_text("Invalid user!")
+        return ""
+
     user_member = bot.getChat(user_id)
 
     reply = check_user_id(user_id, bot)
