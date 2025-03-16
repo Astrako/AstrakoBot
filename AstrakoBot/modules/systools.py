@@ -142,7 +142,7 @@ def status(update: Update, context: CallbackContext):
     msg += f"CPU freq: `{psutil.cpu_freq().current:.2f}Mhz`\n" if psutil.cpu_freq() else ""
     msg += f"CPU usage: `{psutil.cpu_percent()}%`\n"
     ram = psutil.virtual_memory()
-    msg += f"RAM: `{get_size(ram.total)} - {get_size(ram.used)} used ({ram.percent}%)`\n"
+    msg += f"RAM: `{get_size(ram.total)} - {get_size(ram.used)} used ({round(ram.used / ram.total * 100, 2)}%)`\n"
     disk = psutil.disk_usage('/')
     msg += f"Disk usage: `{get_size(disk.total)} total - {get_size(disk.used)} used ({disk.percent}%)`\n"
     swap = psutil.swap_memory()
