@@ -48,6 +48,52 @@ def magisk(update: Update, context: CallbackContext):
     if cleartime:
         context.dispatcher.run_async(delete, delmsg, cleartime.time)
 
+def kernelsu(update: Update, context: CallbackContext):
+    message = update.effective_message
+    chat = update.effective_chat
+    repos = [
+        ("KernelSU", "tiann/KernelSU"),
+        ("KernelSU-Next", "KernelSU-Next/KernelSU-Next")
+    ]
+
+    msg = "*Latest KernelSU Releases:*\n\n"
+
+    for repo_name, repo_path in repos:
+        try:
+            api_url = f"https://api.github.com/repos/{repo_path}/releases/latest"
+            response = get(api_url, headers=rget_headers)
+            response.raise_for_status()
+            data = response.json()
+
+            msg += f"*{repo_name}:*\n"
+            msg += f'• Release - [{data["tag_name"]}]({data["html_url"]})\n'
+
+            apk_assets = [asset for asset in data["assets"] if asset["name"].lower().endswith(".apk")]
+            if apk_assets:
+                for asset in apk_assets:
+                    msg += f'• APK - [{asset["name"]}]({asset["browser_download_url"]})\n'
+            else:
+                msg += "• APK - No APK assets found\n"
+
+            msg += "\n"
+
+        except Exception as e:
+            msg += f"*{repo_name}:* Error fetching data ({str(e)})\n\n"
+            continue
+
+    if "Error fetching data" in msg:
+        msg += "\n⚠️ Failed to fetch some releases, try again later."
+
+    delmsg = message.reply_text(
+        text=msg,
+        parse_mode=ParseMode.MARKDOWN,
+        disable_web_page_preview=True,
+    )
+
+    cleartime = get_clearcmd(chat.id, "kernelsu")
+
+    if cleartime:
+        context.dispatcher.run_async(delete, delmsg, cleartime.time)
 
 def checkfw(update: Update, context: CallbackContext):
     args = context.args
@@ -317,6 +363,8 @@ __help__ = """
 *Available commands:*\n
 *Magisk:* 
 • `/magisk`, `/su`, `/root`: fetches latest magisk\n
+*KernelSU:*
+• `/kernelsu`: fetches latest kernelsu\n
 *OrangeFox Recovery Project:* 
 • `/orangefox` `<devicecodename>`: fetches lastest OrangeFox Recovery available for a given device codename\n
 *TWRP:* 
@@ -331,6 +379,7 @@ __help__ = """
 """
 
 MAGISK_HANDLER = CommandHandler(["magisk", "root", "su"], magisk, run_async=True)
+KERNELSU_HANDLER = CommandHandler("kernelsu", kernelsu, run_async=True)
 ORANGEFOX_HANDLER = CommandHandler("orangefox", orangefox, run_async=True)
 TWRP_HANDLER = CommandHandler("twrp", twrp, run_async=True)
 GETFW_HANDLER = CommandHandler("getfw", getfw, run_async=True)
@@ -338,8 +387,8 @@ CHECKFW_HANDLER = CommandHandler("checkfw", checkfw, run_async=True)
 PHH_HANDLER = CommandHandler("phh", phh, run_async=True)
 MIUI_HANDLER = CommandHandler("miui", miui, run_async=True)
 
-
 dispatcher.add_handler(MAGISK_HANDLER)
+dispatcher.add_handler(KERNELSU_HANDLER)
 dispatcher.add_handler(ORANGEFOX_HANDLER)
 dispatcher.add_handler(TWRP_HANDLER)
 dispatcher.add_handler(GETFW_HANDLER)
@@ -348,5 +397,5 @@ dispatcher.add_handler(PHH_HANDLER)
 dispatcher.add_handler(MIUI_HANDLER)
 
 __mod_name__ = "Android"
-__command_list__ = ["magisk", "root", "su", "orangefox", "twrp", "checkfw", "getfw", "phh", "miui"]
-__handlers__ = [MAGISK_HANDLER, ORANGEFOX_HANDLER, TWRP_HANDLER, GETFW_HANDLER, CHECKFW_HANDLER, PHH_HANDLER, MIUI_HANDLER]
+__command_list__ = ["magisk", "kernelsu", "root", "su", "orangefox", "twrp", "checkfw", "getfw", "phh", "miui"]
+__handlers__ = [MAGISK_HANDLER, KERNELSU_HANDLER, ORANGEFOX_HANDLER, TWRP_HANDLER, GETFW_HANDLER, CHECKFW_HANDLER, PHH_HANDLER, MIUI_HANDLER]
