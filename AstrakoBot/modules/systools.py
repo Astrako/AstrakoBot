@@ -65,6 +65,16 @@ def get_size(bytes, suffix="B"):
 def convert(speed):
     return round(int(speed) / 1048576, 2)
 
+def get_network_speed():
+    old = psutil.net_io_counters()
+
+    time.sleep(1)
+
+    new = psutil.net_io_counters()
+
+    upload = (new.bytes_sent - old.bytes_sent)
+    download = (new.bytes_recv - old.bytes_recv)
+    return upload, download
 
 @owner_plus
 def shell(update: Update, context: CallbackContext):
@@ -137,6 +147,8 @@ def status(update: Update, context: CallbackContext):
     msg += f"Disk usage: `{get_size(disk.total)} total - {get_size(disk.used)} used ({disk.percent}%)`\n"
     swap = psutil.swap_memory()
     msg += f"SWAP: `{get_size(swap.total)} - {get_size(swap.used)} used ({swap.percent}%)`\n"
+    upload, download = get_network_speed()
+    msg += f"Network: `⬇ {get_size(download)}/s | ⬆ {get_size(upload)}/s`\n"
 
     message.reply_text(
         text = msg,
