@@ -56,22 +56,25 @@ def qr_decode(update: Update, context: CallbackContext):
     document = target.document
 
     file = None
+    file_size = 0
     if photo:
+        file_size = photo.file_size
         file = photo.get_file()
     elif document and document.mime_type.startswith('image/'):
+        file_size = document.file_size
         file = document.get_file()
     else:
         message.reply_text("Please reply to or send an image containing a QR code")
+        return
+
+    if file_size > 1048576:
+        message.reply_text("Image too large! Max 1MB allowed")
         return
 
     try:
         img_data = BytesIO()
         file.download(out=img_data)
         img_data.seek(0)
-
-        if img_data.getbuffer().nbytes > 1048576:
-            message.reply_text("Image too large! Max 1MB allowed")
-            return
 
         response = requests.post(
             'https://api.qrserver.com/v1/read-qr-code/',
