@@ -248,28 +248,22 @@ def temp_mute(update: Update, context: CallbackContext) -> str:
         log += f"\n<b>Reason:</b> {reason}"
 
     try:
-        if member.can_send_messages is None or member.can_send_messages:
-            chat_permissions = ChatPermissions(can_send_messages=False)
-            bot.restrict_chat_member(
-                chat.id, user_id, chat_permissions, until_date=mutetime
+        chat_permissions = ChatPermissions(can_send_messages=False)
+        bot.restrict_chat_member(
+            chat.id, user_id, chat_permissions, until_date=mutetime
+        )
+        if not silent:
+            reply = (
+                f"<code>❕</code><b>Mute Event</b>\n"
+                f"<code> </code><b>•  User:</b> {mention_html(member.user.id, html.escape(member.user.first_name))}\n"
+                f"<code> </code><b>•  Time: {time_val}</b>"
             )
-            if not silent:
-                reply = (
-                    f"<code>❕</code><b>Mute Event</b>\n"
-                    f"<code> </code><b>•  User:</b> {mention_html(member.user.id, html.escape(member.user.first_name))}\n"
-                    f"<code> </code><b>•  Time: {time_val}</b>"
-                )
-                if reason:
-                    reply += f"\n<code> </code><b>•  Reason:</b> {html.escape(reason)}"
-                bot.sendMessage(chat.id, reply, parse_mode=ParseMode.HTML)
-            else:
-                message.delete()
-            return log
+            if reason:
+                reply += f"\n<code> </code><b>•  Reason:</b> {html.escape(reason)}"
+            bot.sendMessage(chat.id, reply, parse_mode=ParseMode.HTML)
         else:
-            if not silent:
-                message.reply_text("This user is already muted.")
-            else:
-                message.delete()
+            message.delete()
+        return log
 
     except BadRequest as excp:
         if excp.message == "Reply message not found":
