@@ -90,7 +90,7 @@ __help__ = """
 *Markdown:*
  • `/markdownhelp`*:* quick summary of how markdown works in telegram - can only be called in private chats\n
 *Paste:*
- • `/paste`*:* saves replied content to `nekobin.com` and replies with a url\n
+ • `/paste`*:* saves replied content to `dpaste.com` and replies with a url\n
 *React:*
  • `/react`*:* reacts with a random reaction\n
 *Urban Dictonary:*
