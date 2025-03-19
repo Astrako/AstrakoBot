@@ -430,13 +430,25 @@ def new_member(update: Update, context: CallbackContext):
 
     if welcome_bool:
         if media_wel:
-            sent = ENUM_FUNC_MAP[welc_type](
-                chat.id,
-                cust_content,
-                caption=res,
-                reply_markup=keyboard,
-                parse_mode="markdown",
-            )
+            # Stickers have no caption, send separately
+            if welc_type == sql.Types.STICKER:
+                sent_media = ENUM_FUNC_MAP[welc_type](
+                    chat.id,
+                    cust_content,
+                    reply_markup=keyboard
+                ) and ENUM_FUNC_MAP[sql.Types.TEXT](
+                    chat.id,
+                    res,
+                    parse_mode="markdown"
+                )
+            else:
+                sent = ENUM_FUNC_MAP[welc_type](
+                    chat.id,
+                    cust_content,
+                    caption=res,
+                    reply_markup=keyboard,
+                    parse_mode="markdown"
+                )
         else:
             sent = send(update, res, keyboard, backup_message)
         deletion(update, context, sent)
