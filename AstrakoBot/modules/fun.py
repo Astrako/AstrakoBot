@@ -140,20 +140,6 @@ def roll(update: Update, context: CallbackContext):
     deletion(update, context, update.message.reply_text(random.choice(range(1, 7))))
 
 
-def shout(update: Update, context: CallbackContext):
-    args = context.args
-    text = " ".join(args)
-    result = []
-    result.append(" ".join(list(text)))
-    for pos, symbol in enumerate(text[1:]):
-        result.append(symbol + " " + "  " * pos + symbol)
-    result = list("\n".join(result))
-    result[0] = text[0]
-    result = "".join(result)
-    msg = "```\n" + result + "```"
-    deletion(update, context, update.effective_message.reply_text(msg, parse_mode="MARKDOWN"))
-
-
 def toss(update: Update, context: CallbackContext):
     deletion(update, context, update.message.reply_text(random.choice(fun_strings.TOSS)))
 
@@ -254,9 +240,7 @@ RLG_HANDLER = DisableAbleCommandHandler("rlg", rlg, run_async=True)
 DECIDE_HANDLER = DisableAbleCommandHandler("decide", decide, run_async=True)
 EIGHTBALL_HANDLER = DisableAbleCommandHandler("8ball", eightball, run_async=True)
 TABLE_HANDLER = DisableAbleCommandHandler("table", table, run_async=True)
-SHOUT_HANDLER = DisableAbleCommandHandler("shout", shout, run_async=True)
 
-dispatcher.add_handler(SHOUT_HANDLER)
 dispatcher.add_handler(SANITIZE_HANDLER)
 dispatcher.add_handler(RUNS_HANDLER)
 dispatcher.add_handler(SLAP_HANDLER)
@@ -283,7 +267,6 @@ __command_list__ = [
     "table",
     "pat",
     "sanitize",
-    "shout",
     "8ball",
 ]
 __handlers__ = [
@@ -298,6 +281,5 @@ __handlers__ = [
     DECIDE_HANDLER,
     TABLE_HANDLER,
     SANITIZE_HANDLER,
-    SHOUT_HANDLER,
     EIGHTBALL_HANDLER,
 ]
