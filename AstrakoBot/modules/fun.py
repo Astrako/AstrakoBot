@@ -13,8 +13,6 @@ from telegram import ChatPermissions, ParseMode, Update
 from telegram.error import BadRequest
 from telegram.ext import CallbackContext, run_async
 
-GIF_ID = "CgACAgQAAx0CSVUvGgAC7KpfWxMrgGyQs-GUUJgt-TSO8cOIDgACaAgAAlZD0VHT3Zynpr5nGxsE"
-
 
 def runs(update: Update, context: CallbackContext):
     deletion(update, context, update.effective_message.reply_text(random.choice(fun_strings.RUN_STRINGS)))
@@ -27,12 +25,17 @@ def sanitize(update: Update, context: CallbackContext):
         if message.reply_to_message
         else message.from_user.first_name
     )
-    reply_animation = (
-        message.reply_to_message.reply_animation
+
+    reply_msg = (
+        message.reply_to_message
         if message.reply_to_message
-        else message.reply_animation
+        else message
     )
-    deletion(update, context, reply_animation(random.choice(fun_strings.GIFS), caption=f"*Sanitizes {name}*"))
+
+    try:
+        deletion(update, context, reply_msg.reply_animation(random.choice(fun_strings.GIFS), caption=f"*Sanitizes {name}*"))
+    except BadRequest:
+        deletion(update, context, reply_msg.reply_text(f"*Sanitizes {name}*"))
 
 
 def slap(update: Update, context: CallbackContext):
