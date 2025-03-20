@@ -212,90 +212,6 @@ def table(update: Update, context: CallbackContext):
     deletion(update, context, reply_text(random.choice(fun_strings.TABLE)))
 
 
-normiefont = [
-    "a",
-    "b",
-    "c",
-    "d",
-    "e",
-    "f",
-    "g",
-    "h",
-    "i",
-    "j",
-    "k",
-    "l",
-    "m",
-    "n",
-    "o",
-    "p",
-    "q",
-    "r",
-    "s",
-    "t",
-    "u",
-    "v",
-    "w",
-    "x",
-    "y",
-    "z",
-]
-weebyfont = [
-    "卂",
-    "乃",
-    "匚",
-    "刀",
-    "乇",
-    "下",
-    "厶",
-    "卄",
-    "工",
-    "丁",
-    "长",
-    "乚",
-    "从",
-    "𠘨",
-    "口",
-    "尸",
-    "㔿",
-    "尺",
-    "丂",
-    "丅",
-    "凵",
-    "リ",
-    "山",
-    "乂",
-    "丫",
-    "乙",
-]
-
-
-def weebify(update: Update, context: CallbackContext):
-    args = context.args
-    message = update.effective_message
-    string = ""
-
-    if message.reply_to_message:
-        string = message.reply_to_message.text.lower().replace(" ", "  ")
-
-    if args:
-        string = "  ".join(args).lower()
-
-    if not string:
-        deletion(update, context, message.reply_text("Usage is `/weebify <text>`", parse_mode=ParseMode.MARKDOWN))
-        return
-
-    for normiecharacter in string:
-        if normiecharacter in normiefont:
-            weebycharacter = weebyfont[normiefont.index(normiecharacter)]
-            string = string.replace(normiecharacter, weebycharacter)
-
-    if message.reply_to_message:
-        deletion(update, context, message.reply_to_message.reply_text(string))
-    else:
-        deletion(update, context, message.reply_text(string))
-
-
 def deletion(update: Update, context: CallbackContext, delmsg):
     chat = update.effective_chat
     cleartime = get_clearcmd(chat.id, "fun")
@@ -336,9 +252,7 @@ DECIDE_HANDLER = DisableAbleCommandHandler("decide", decide, run_async=True)
 EIGHTBALL_HANDLER = DisableAbleCommandHandler("8ball", eightball, run_async=True)
 TABLE_HANDLER = DisableAbleCommandHandler("table", table, run_async=True)
 SHOUT_HANDLER = DisableAbleCommandHandler("shout", shout, run_async=True)
-WEEBIFY_HANDLER = DisableAbleCommandHandler("weebify", weebify, run_async=True)
 
-dispatcher.add_handler(WEEBIFY_HANDLER)
 dispatcher.add_handler(SHOUT_HANDLER)
 dispatcher.add_handler(SANITIZE_HANDLER)
 dispatcher.add_handler(RUNS_HANDLER)
@@ -367,7 +281,6 @@ __command_list__ = [
     "pat",
     "sanitize",
     "shout",
-    "weebify",
     "8ball",
 ]
 __handlers__ = [
@@ -383,6 +296,5 @@ __handlers__ = [
     TABLE_HANDLER,
     SANITIZE_HANDLER,
     SHOUT_HANDLER,
-    WEEBIFY_HANDLER,
     EIGHTBALL_HANDLER,
 ]
