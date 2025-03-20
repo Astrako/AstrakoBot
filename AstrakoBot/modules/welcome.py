@@ -432,7 +432,7 @@ def new_member(update: Update, context: CallbackContext):
         if media_wel:
             # Stickers have no caption, send separately
             if welc_type == sql.Types.STICKER:
-                sent_media = ENUM_FUNC_MAP[welc_type](
+                sent = ENUM_FUNC_MAP[welc_type](
                     chat.id,
                     cust_content,
                     reply_markup=keyboard
