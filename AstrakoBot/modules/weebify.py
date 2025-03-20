@@ -67,7 +67,8 @@ def weebify(update: Update, context: CallbackContext):
     string = ""
 
     if message.reply_to_message:
-        string = message.reply_to_message.text.lower().replace(" ", "  ")
+        text = message.reply_to_message.text or message.reply_to_message.caption or ""
+        string = text.lower().replace(" ", "  ")
 
     if args:
         string = "  ".join(args).lower()
