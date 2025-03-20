@@ -31,7 +31,6 @@ from AstrakoBot import (
     dispatcher,
 )
 from AstrakoBot.modules.helper_funcs.chat_status import (
-    is_user_admin,
     support_plus,
     user_admin,
 )

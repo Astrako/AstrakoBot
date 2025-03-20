@@ -8,7 +8,6 @@ from AstrakoBot.modules.disable import DisableAbleCommandHandler
 from AstrakoBot.modules.helper_funcs.chat_status import (
     bot_admin,
     can_restrict,
-    is_user_admin,
     user_admin,
     user_admin_no_reply,
     can_delete,
@@ -23,6 +22,7 @@ from AstrakoBot.modules.helper_funcs.misc import split_message
 from AstrakoBot.modules.helper_funcs.string_handling import split_quotes
 from AstrakoBot.modules.log_channel import loggable
 from AstrakoBot.modules.sql import warns_sql as sql
+from AstrakoBot.modules.helper_funcs.admin_status import user_is_admin
 from telegram import (
     CallbackQuery,
     Chat,
@@ -54,7 +54,7 @@ CURRENT_WARNING_FILTER_STRING = "<b>Current warning filters in this chat:</b>\n"
 def warn(
     user: User, chat: Chat, reason: str, message: Message, warner: User = None
 ) -> str:
-    if is_user_admin(chat, user.id):
+    if user_is_admin(chat, user.id):
         # message.reply_text("Damn admins, They are too far to be One Punched!")
         return
 

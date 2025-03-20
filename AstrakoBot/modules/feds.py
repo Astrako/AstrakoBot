@@ -21,7 +21,6 @@ from AstrakoBot.modules.disable import DisableAbleCommandHandler
 from AstrakoBot.modules.helper_funcs.admin_status import get_bot_member, user_is_admin
 from AstrakoBot.modules.helper_funcs.alternate import send_message
 from AstrakoBot.modules.helper_funcs.chat_status import (
-    is_user_admin,
     can_delete,
 )
 from AstrakoBot.modules.helper_funcs.extraction import (
@@ -29,6 +28,7 @@ from AstrakoBot.modules.helper_funcs.extraction import (
     extract_user,
     extract_user_fban,
 )
+from AstrakoBot.modules.helper_funcs.admin_status import user_is_admin
 from AstrakoBot.modules.helper_funcs.string_handling import markdown_parser
 from telegram import (
     Chat, InlineKeyboardButton,
@@ -212,7 +212,7 @@ def fed_chat(update: Update, context: CallbackContext):
     fed_id = sql.get_fed_id(chat.id)
 
     user_id = update.effective_message.from_user.id
-    if not is_user_admin(update.effective_chat, user_id):
+    if not user_is_admin(update.effective_chat, user_id):
         update.effective_message.reply_text(
             "You must be an admin to execute this command"
         )

@@ -15,7 +15,7 @@ from AstrakoBot.modules.helper_funcs.chat_status import (
     user_admin,
     ADMIN_CACHE,
 )
-
+from AstrakoBot.modules.helper_funcs.admin_status import get_bot_member
 from AstrakoBot.modules.helper_funcs.extraction import (
     extract_user,
     extract_user_and_text,
@@ -68,7 +68,7 @@ def promote(update: Update, context: CallbackContext) -> str:
         return
 
     # set same perms as bot - bot can't assign higher perms than itself!
-    bot_member = chat.get_member(bot.id)
+    bot_member = get_bot_member(chat.id)
 
     try:
         bot.promoteChatMember(
@@ -358,7 +358,7 @@ def invite(update: Update, context: CallbackContext):
     if chat.username:
         update.effective_message.reply_text(f"https://t.me/{chat.username}")
     elif chat.type in [chat.SUPERGROUP, chat.CHANNEL]:
-        bot_member = chat.get_member(bot.id)
+        bot_member = get_bot_member(chat.id)
         if bot_member.can_invite_users:
             invitelink = bot.exportChatInviteLink(chat.id)
             update.effective_message.reply_text(invitelink)

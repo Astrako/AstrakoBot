@@ -7,7 +7,6 @@ from telegram import Message, Chat, Update, User, ChatPermissions
 from AstrakoBot import WHITELIST_USERS, dispatcher
 from AstrakoBot.modules.helper_funcs.chat_status import (
     bot_admin,
-    is_user_admin,
     user_admin,
     user_admin_no_reply,
 )
@@ -27,6 +26,7 @@ from AstrakoBot.modules.helper_funcs.string_handling import extract_time
 from AstrakoBot.modules.connection import connected
 from AstrakoBot.modules.helper_funcs.alternate import send_message
 from AstrakoBot.modules.sql.approve_sql import is_approved
+from AstrakoBot.modules.helper_funcs.admin_status import user_is_admin
 
 FLOOD_GROUP = 3
 
@@ -40,7 +40,7 @@ def check_flood(update: Update, context: CallbackContext) -> str:
         return ""
 
     # ignore admins, whitelists and telegram's native tech
-    if is_user_admin(chat, user.id) or user.id in WHITELIST_USERS or user.id == 777000:
+    if user_is_admin(chat, user.id) or user.id in WHITELIST_USERS or user.id == 777000:
         sql.update_flood(chat.id, None)
         return ""
     # ignore approved users

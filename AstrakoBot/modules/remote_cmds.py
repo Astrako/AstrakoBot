@@ -7,6 +7,7 @@ from AstrakoBot.modules.helper_funcs.chat_status import (
 )
 from AstrakoBot.modules.helper_funcs.extraction import extract_user_and_text
 from AstrakoBot.modules.helper_funcs.filters import CustomFilters
+from AstrakoBot.modules.helper_funcs.admin_status import get_bot_member
 from telegram import Update, ChatPermissions
 from telegram.error import BadRequest
 from telegram.ext import CallbackContext, CommandHandler, run_async
@@ -119,7 +120,7 @@ def rban(update: Update, context: CallbackContext):
 
     if (
         not is_bot_admin(chat, bot.id)
-        or not chat.get_member(bot.id).can_restrict_members
+        or not get_bot_member(chat.id).can_restrict_members
     ):
         message.reply_text(
             "I can't restrict people there! Make sure I'm admin and can ban users."
@@ -201,7 +202,7 @@ def runban(update: Update, context: CallbackContext):
 
     if (
         not is_bot_admin(chat, bot.id)
-        or not chat.get_member(bot.id).can_restrict_members
+        or not get_bot_member(chat.id).can_restrict_members
     ):
         message.reply_text(
             "I can't unrestrict people there! Make sure I'm admin and can unban users."
@@ -285,7 +286,7 @@ def rkick(update: Update, context: CallbackContext):
 
     if (
         not is_bot_admin(chat, bot.id)
-        or not chat.get_member(bot.id).can_restrict_members
+        or not get_bot_member(chat.id).can_restrict_members
     ):
         message.reply_text(
             "I can't restrict people there! Make sure I'm admin and can punch users."
@@ -367,7 +368,7 @@ def rmute(update: Update, context: CallbackContext):
 
     if (
         not is_bot_admin(chat, bot.id)
-        or not chat.get_member(bot.id).can_restrict_members
+        or not get_bot_member(chat.id).can_restrict_members
     ):
         message.reply_text(
             "I can't restrict people there! Make sure I'm admin and can mute users."
@@ -451,7 +452,7 @@ def runmute(update: Update, context: CallbackContext):
 
     if (
         not is_bot_admin(chat, bot.id)
-        or not chat.get_member(bot.id).can_restrict_members
+        or not get_bot_member(chat.id).can_restrict_members
     ):
         message.reply_text(
             "I can't unrestrict people there! Make sure I'm admin and can unban users."

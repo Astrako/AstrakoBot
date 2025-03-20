@@ -26,7 +26,7 @@ from AstrakoBot import (
 # needed to dynamically load modules
 # NOTE: Module order is not guaranteed, specify that in the config file!
 from AstrakoBot.modules import ALL_MODULES
-from AstrakoBot.modules.helper_funcs.chat_status import is_user_admin
+from AstrakoBot.modules.helper_funcs.admin_status import user_is_admin
 from AstrakoBot.modules.helper_funcs.misc import paginate_modules
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup, ParseMode, Update
 from telegram.error import (
@@ -203,7 +203,7 @@ def start(update: Update, context: CallbackContext):
                 match = re.match("stngs_(.*)", args[0].lower())
                 chat = dispatcher.bot.getChat(match.group(1))
 
-                if is_user_admin(chat, update.effective_user.id):
+                if user_is_admin(chat, update.effective_user.id):
                     send_settings(match.group(1), update.effective_user.id, False)
                 else:
                     send_settings(match.group(1), update.effective_user.id, True)
@@ -551,7 +551,7 @@ def get_settings(update: Update, context: CallbackContext):
 
     # ONLY send settings in PM
     if chat.type != chat.PRIVATE:
-        if is_user_admin(chat, user.id):
+        if user_is_admin(chat, user.id):
             text = "Click here to get this chat's settings, as well as yours."
             msg.reply_text(
                 text,

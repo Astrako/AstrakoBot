@@ -11,11 +11,11 @@ from telegram.utils.helpers import mention_html
 from alphabet_detector import AlphabetDetector
 
 import AstrakoBot.modules.sql.locks_sql as sql
+from AstrakoBot.modules.helper_funcs.admin_status import user_is_admin
 from AstrakoBot import dispatcher, SUDO_USERS, LOGGER
 from AstrakoBot.modules.disable import DisableAbleCommandHandler
 from AstrakoBot.modules.helper_funcs.chat_status import (
     can_delete,
-    is_user_admin,
     user_not_admin,
     is_bot_admin,
     user_admin,
@@ -102,7 +102,7 @@ class CustomCommandHandler(tg.CommandHandler):
 
     def check_update(self, update):
         if super().check_update(update) and not (
-                sql.is_restr_locked(update.effective_chat.id, 'messages') and not is_user_admin(update.effective_chat,
+                sql.is_restr_locked(update.effective_chat.id, 'messages') and not user_is_admin(update.effective_chat,
                                                                                                 update.effective_user.id)):
             args = update.effective_message.text.split()[1:]
             filter_result = self.filters(update)
@@ -292,7 +292,7 @@ def unlock(update: Update, context: CallbackContext) -> str:
     chat = update.effective_chat
     user = update.effective_user
     message = update.effective_message
-    if is_user_admin(chat, message.from_user.id):
+    if user_is_admin(chat, message.from_user.id):
         if len(args) >= 1:
             ltype = args[0].lower()
             if ltype in LOCK_TYPES:

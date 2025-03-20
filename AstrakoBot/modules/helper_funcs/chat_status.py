@@ -16,6 +16,7 @@ from AstrakoBot import (
 from telegram import Chat, ChatMember, ParseMode, Update
 from telegram.ext import CallbackContext
 from telegram.error import Unauthorized
+from AstrakoBot.modules.helper_funcs.admin_status import get_bot_member, user_is_admin
 
 # stores admemes in memory for 10 min.
 ADMIN_CACHE = TTLCache(maxsize=512, ttl=60 * 10, timer=perf_counter)
@@ -34,48 +35,18 @@ def is_sudo_plus(chat: Chat, user_id: int, member: ChatMember = None) -> bool:
     return user_id in SUDO_USERS or user_id in DEV_USERS
 
 
-def is_user_admin(chat: Chat, user_id: int, member: ChatMember = None) -> bool:
-    if (
-        chat.type == "private"
-        or user_id in SUDO_USERS
-        or user_id in DEV_USERS
-        or chat.all_members_are_administrators
-        or user_id in [1087968824]
-    ):  # Count telegram and Group Anonymous as admin
-        return True
-    if not member:
-        with THREAD_LOCK:
-            # try to fetch from cache first.
-            try:
-                return user_id in ADMIN_CACHE[chat.id]
-            except KeyError:
-                # keyerror happend means cache is deleted,
-                # so query bot api again and return user status
-                # while saving it in cache for future useage...
-                try:
-                    chat_admins = dispatcher.bot.getChatAdministrators(chat.id)
-                except Unauthorized:
-                    return False # bot is not member of the supergroup
-                admin_list = [x.user.id for x in chat_admins]
-                ADMIN_CACHE[chat.id] = admin_list
-
-                return user_id in admin_list
-    else:
-        return member.status in ("administrator", "creator")
-
-
 def is_bot_admin(chat: Chat, bot_id: int, bot_member: ChatMember = None) -> bool:
     if chat.type == "private" or chat.all_members_are_administrators:
         return True
 
     if not bot_member:
-        bot_member = chat.get_member(bot_id)
+        bot_member = get_bot_member(chat.id)
 
     return bot_member.status in ("administrator", "creator")
 
 
 def can_delete(chat: Chat, bot_id: int) -> bool:
-    return chat.get_member(bot_id).can_delete_messages
+    return get_bot_member(chat.id).can_delete_messages
 
 
 def is_user_ban_protected(chat: Chat, user_id: int, member: ChatMember = None) -> bool:
@@ -228,7 +199,7 @@ def user_admin(func):
         user = update.effective_user
         chat = update.effective_chat
 
-        if user and is_user_admin(chat, user.id):
+        if user and user_is_admin(chat, user.id):
             return func(update, context, *args, **kwargs)
         elif not user:
             pass
@@ -254,7 +225,7 @@ def user_admin_no_reply(func):
         user = update.effective_user
         chat = update.effective_chat
 
-        if user and is_user_admin(chat, user.id):
+        if user and user_is_admin(chat, user.id):
             return func(update, context, *args, **kwargs)
         elif not user:
             pass
@@ -274,7 +245,7 @@ def user_not_admin(func):
         user = update.effective_user
         chat = update.effective_chat
 
-        if user and not is_user_admin(chat, user.id):
+        if user and not user_is_admin(chat, user.id):
             return func(update, context, *args, **kwargs)
         elif not user:
             pass
@@ -339,7 +310,7 @@ def can_pin(func):
         else:
             cant_pin = f"I can't pin messages in <b>{update_chat_title}</b>!\nMake sure I'm admin and can pin messages there."
 
-        if chat.get_member(bot.id).can_pin_messages:
+        if get_bot_member(chat.id).can_pin_messages:
             return func(update, context, *args, **kwargs)
         else:
             update.effective_message.reply_text(cant_pin, parse_mode=ParseMode.HTML)
@@ -363,7 +334,7 @@ def can_promote(func):
                 f"Make sure I'm admin there and can appoint new admins."
             )
 
-        if chat.get_member(bot.id).can_promote_members:
+        if get_bot_member(chat.id).can_promote_members:
             return func(update, context, *args, **kwargs)
         else:
             update.effective_message.reply_text(cant_promote, parse_mode=ParseMode.HTML)
@@ -384,7 +355,7 @@ def can_restrict(func):
         else:
             cant_restrict = f"I can't restrict people in <b>{update_chat_title}</b>!\nMake sure I'm admin there and can restrict users."
 
-        if chat.get_member(bot.id).can_restrict_members:
+        if get_bot_member(chat.id).can_restrict_members:
             return func(update, context, *args, **kwargs)
         else:
             update.effective_message.reply_text(

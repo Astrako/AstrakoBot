@@ -8,6 +8,7 @@ from AstrakoBot.modules.helper_funcs.chat_status import (
     dev_plus,
     user_admin,
 )
+from AstrakoBot.modules.helper_funcs.admin_status import get_bot_member
 from AstrakoBot.modules.sql import cleaner_sql as sql
 from telegram import ParseMode, Update
 from telegram.ext import (
@@ -46,7 +47,7 @@ def clean_blue_text_must_click(update: Update, context: CallbackContext):
     bot = context.bot
     chat = update.effective_chat
     message = update.effective_message
-    if chat.get_member(bot.id).can_delete_messages and sql.is_enabled(chat.id):
+    if get_bot_member(chat.id).can_delete_messages and sql.is_enabled(chat.id):
         fst_word = message.text.strip().split(None, 1)[0]
 
         if len(fst_word) > 1 and any(

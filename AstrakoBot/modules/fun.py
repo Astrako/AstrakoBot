@@ -5,7 +5,7 @@ import time
 import AstrakoBot.modules.fun_strings as fun_strings
 from AstrakoBot import dispatcher
 from AstrakoBot.modules.disable import DisableAbleCommandHandler
-from AstrakoBot.modules.helper_funcs.chat_status import is_user_admin
+from AstrakoBot.modules.helper_funcs.admin_status import user_is_admin
 from AstrakoBot.modules.helper_funcs.extraction import extract_user
 from AstrakoBot.modules.helper_funcs.misc import delete
 from AstrakoBot.modules.sql.clear_cmd_sql import get_clearcmd
@@ -57,7 +57,7 @@ def slap(update: Update, context: CallbackContext):
 
         if isinstance(temp, list):
             if temp[2] == "tmute":
-                if is_user_admin(chat, message.from_user.id):
+                if user_is_admin(chat, message.from_user.id):
                     reply_text(temp[1])
                     return
 
