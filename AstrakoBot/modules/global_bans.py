@@ -380,10 +380,17 @@ def ungban(update: Update, context: CallbackContext):
 
     if ungban_time > 60:
         ungban_time = round((ungban_time / 60), 2)
-        message.reply_text(f"Person has been un-gbanned. Took {ungban_time} min")
+        text = (f"Person has been un-gbanned. Took {ungban_time} min")
     else:
-        message.reply_text(f"Person has been un-gbanned. Took {ungban_time} sec")
+        text = (f"Person has been un-gbanned. Took {ungban_time} sec")
 
+    try:
+        message.reply_text(text)
+    except BadRequest:
+        context.bot.send_message(
+            chat_id=chat.id,
+            text=text
+    )
 
 @support_plus
 def gbanlist(update: Update, context: CallbackContext):
@@ -423,14 +430,22 @@ def check_and_ban(update, user_id, should_message=True):
     if sw_ban:
         update.effective_chat.ban_member(user_id)
         if should_message:
-            update.effective_message.reply_text(
+            text = (
                 f"<b>Alert</b>: this user is globally banned.\n"
                 f"<code>*bans them from here*</code>.\n"
                 f"<b>Appeal chat</b>: {SPAMWATCH_SUPPORT_CHAT}\n"
                 f"<b>User ID</b>: <code>{sw_ban.id}</code>\n"
-                f"<b>Ban Reason</b>: <code>{html.escape(sw_ban.reason)}</code>",
-                parse_mode=ParseMode.HTML,
+                f"<b>Ban Reason</b>: <code>{html.escape(sw_ban.reason)}</code>"
             )
+            try:
+                update.effective_message.reply_text(text, parse_mode=ParseMode.HTML)
+            except BadRequest:
+                update.effective_chat.bot.send_message(
+                    chat_id=update.effective_chat.id,
+                    text=text,
+                    parse_mode=ParseMode.HTML
+            )
+
         return
 
     if sql.is_user_gbanned(user_id):
@@ -445,8 +460,14 @@ def check_and_ban(update, user_id, should_message=True):
             user = sql.get_gbanned_user(user_id)
             if user.reason:
                 text += f"\n<b>Ban Reason:</b> <code>{html.escape(user.reason)}</code>"
-            update.effective_message.reply_text(text, parse_mode=ParseMode.HTML)
-
+            try:
+                update.effective_message.reply_text(text, parse_mode=ParseMode.HTML)
+            except BadRequest:
+                update.effective_chat.bot.send_message(
+                    chat_id=update.effective_chat.id,
+                    text=text,
+                    parse_mode=ParseMode.HTML
+            )
 
 def enforce_gban(update: Update, _: CallbackContext):
     chat = update.effective_chat
