@@ -352,23 +352,11 @@ def user_join_fed(update: Update, context: CallbackContext):
 
     if is_user_fed_owner(fed_id, user.id) or user.id in SUDO_USERS:
         user_id = extract_user(msg, args)
-        if user_id:
-            user = bot.get_chat(user_id)
-        elif not msg.reply_to_message and not args:
-            user = msg.from_user
-        elif not msg.reply_to_message and (
-            not args
-            or (
-                len(args) >= 1
-                and not args[0].startswith("@")
-                and not args[0].isdigit()
-                and not msg.parse_entities([MessageEntity.TEXT_MENTION])
-            )
-        ):
-            msg.reply_text("I cannot extract user from this message")
+        if not user_id:
+            msg.reply_text("Who are you trying to promote?")
             return
-        else:
-            LOGGER.warning("error")
+        user = bot.get_chat(user_id)
+
         getuser = sql.search_user_in_fed(fed_id, user_id)
         fed_id = sql.get_fed_id(chat.id)
         if not fed_id:
@@ -417,28 +405,13 @@ def user_demote_fed(update: Update, context: CallbackContext):
 
     fed_id = sql.get_fed_id(chat.id)
 
-    if is_user_fed_owner(fed_id, user.id):
+    if is_user_fed_owner(fed_id, user.id) or user.id in SUDO_USERS:
         msg = update.effective_message
         user_id = extract_user(msg, args)
-        if user_id:
-            user = bot.get_chat(user_id)
-
-        elif not msg.reply_to_message and not args:
-            user = msg.from_user
-
-        elif not msg.reply_to_message and (
-            not args
-            or (
-                len(args) >= 1
-                and not args[0].startswith("@")
-                and not args[0].isdigit()
-                and not msg.parse_entities([MessageEntity.TEXT_MENTION])
-            )
-        ):
-            msg.reply_text("I cannot extract user from this message")
+        if not user_id:
+            msg.reply_text("Who are you trying to demote?")
             return
-        else:
-            LOGGER.warning("error")
+        user = bot.get_chat(user_id)
 
         if user_id == bot.id:
             update.effective_message.reply_text(
