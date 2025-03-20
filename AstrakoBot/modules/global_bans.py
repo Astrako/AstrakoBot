@@ -388,7 +388,7 @@ def ungban(update: Update, context: CallbackContext):
         message.reply_text(text)
     except BadRequest:
         context.bot.send_message(
-            chat_id=chat.id,
+            chat_id=update.effective_chat.id,
             text=text
     )
 
