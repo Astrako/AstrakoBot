@@ -16,6 +16,7 @@ import AstrakoBot.modules.sql.users_sql as sql
 from AstrakoBot import DEV_USERS, LOGGER, OWNER_ID, dispatcher
 from AstrakoBot.modules.helper_funcs.chat_status import dev_plus, sudo_plus
 from AstrakoBot.modules.sql.users_sql import get_all_users
+from AstrakoBot.modules.helper_funcs.admin_status import get_bot_member
 
 USERS_GROUP = 4
 CHAT_GROUP = 5
@@ -181,7 +182,7 @@ def chats(update: Update, context: CallbackContext):
 def chat_checker(update: Update, context: CallbackContext):
     bot = context.bot
     try:
-        if update.effective_message.chat.get_member(bot.id).can_send_messages is False:
+        if get_bot_member(update.effective_chat.id).can_send_messages is False:
             bot.leaveChat(update.effective_message.chat.id)
     except:
         pass

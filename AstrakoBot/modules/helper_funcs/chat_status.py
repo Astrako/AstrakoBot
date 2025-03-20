@@ -15,6 +15,7 @@ from AstrakoBot import (
 
 from telegram import Chat, ChatMember, ParseMode, Update
 from telegram.ext import CallbackContext
+from telegram.error import Unauthorized
 
 # stores admemes in memory for 10 min.
 ADMIN_CACHE = TTLCache(maxsize=512, ttl=60 * 10, timer=perf_counter)
@@ -51,7 +52,10 @@ def is_user_admin(chat: Chat, user_id: int, member: ChatMember = None) -> bool:
                 # keyerror happend means cache is deleted,
                 # so query bot api again and return user status
                 # while saving it in cache for future useage...
-                chat_admins = dispatcher.bot.getChatAdministrators(chat.id)
+                try:
+                    chat_admins = dispatcher.bot.getChatAdministrators(chat.id)
+                except Unauthorized:
+                    return False # bot is not member of the supergroup
                 admin_list = [x.user.id for x in chat_admins]
                 ADMIN_CACHE[chat.id] = admin_list
 

@@ -257,13 +257,15 @@ def start(update: Update, context: CallbackContext):
                 ),
             )
     else:
-        update.effective_message.reply_text(
-            "I'm awake already!\n<b>Haven't slept since:</b> <code>{}</code>".format(
-                uptime
-            ),
-            parse_mode=ParseMode.HTML,
-        )
-
+        try:
+            update.effective_message.reply_text(
+                "I'm awake already!\n<b>Haven't slept since:</b> <code>{}</code>".format(
+                    uptime
+                ),
+                 parse_mode=ParseMode.HTML,
+            )
+        except BadRequest:
+            pass # chat_checker will take care of it, just don't error
 
 # for test purposes
 def error_callback(update: Update, context: CallbackContext):
