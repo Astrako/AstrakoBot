@@ -16,6 +16,7 @@ from AstrakoBot.modules.helper_funcs.extraction import (
 )
 from AstrakoBot.modules.helper_funcs.string_handling import extract_time
 from AstrakoBot.modules.log_channel import loggable
+from AstrakoBot.modules.helper_funcs.admin_status import get_bot_member
 from telegram import Bot, Chat, ChatPermissions, ParseMode, Update
 from telegram.error import BadRequest
 from telegram.ext import CallbackContext, CommandHandler, run_async
@@ -90,6 +91,12 @@ def mute(update: Update, context: CallbackContext) -> str:
 
     if member.can_send_messages is None or member.can_send_messages:
         chat_permissions = ChatPermissions(can_send_messages=False)
+        if not get_bot_member(chat.id).can_restrict_members:
+            if not silent:
+                bot.sendMessage(chat.id, "I can't restrict people here!")
+            else:
+                message.delete()
+            return log
         bot.restrict_chat_member(chat.id, user_id, chat_permissions)
         if not silent:
             reply = (
@@ -150,6 +157,9 @@ def unmute(update: Update, context: CallbackContext) -> str:
         ):
             if not silent:
                 message.reply_text("This user already has the right to speak.")
+        elif not get_bot_member(chat.id).can_restrict_members:
+            if not silent:
+                bot.sendMessage(chat.id, "I can't restrict people here!")
         else:
             chat_permissions = ChatPermissions(
                 can_send_messages=True,
