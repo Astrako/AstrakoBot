@@ -94,7 +94,7 @@ def new_fed(update: Update, context: CallbackContext):
             "Federations can only be created by privately messaging me."
         )
         return
-    if len(message.text) == 1:
+    if not context.args:
         send_message(
             update.effective_message, "Please write the name of the federation!"
         )
