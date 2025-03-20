@@ -6,7 +6,18 @@ from telegram.ext import CallbackContext, run_async
 
 def shout(update: Update, context: CallbackContext):
     args = context.args
-    text = " ".join(args)
+    message = update.effective_message
+
+    text = ""
+    if args:
+        text = " ".join(args)
+    elif message.reply_to_message:
+        text = message.reply_to_message.caption or message.reply_to_message.text or ""
+
+    if not text:
+        message.reply_text("What should i shout?")
+        return
+
     result = []
     result.append(" ".join([s for s in text]))
     for pos, symbol in enumerate(text[1:]):
@@ -15,7 +26,7 @@ def shout(update: Update, context: CallbackContext):
     result[0] = text[0]
     result = "".join(result)
     msg = "```\n" + result + "```"
-    return update.effective_message.reply_text(msg, parse_mode="MARKDOWN")
+    return message.reply_text(msg, parse_mode="MARKDOWN")
 
 
 SHOUT_HANDLER = DisableAbleCommandHandler("shout", shout, run_async=True)
