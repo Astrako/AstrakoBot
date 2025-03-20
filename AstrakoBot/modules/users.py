@@ -183,7 +183,7 @@ def chat_checker(update: Update, context: CallbackContext):
     try:
         if update.effective_message.chat.get_member(bot.id).can_send_messages is False:
             bot.leaveChat(update.effective_message.chat.id)
-    except Unauthorized:
+    except:
         pass
 
 
