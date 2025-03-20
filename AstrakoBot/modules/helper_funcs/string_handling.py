@@ -261,11 +261,11 @@ def extract_time(message, time_val):
             return ""
 
         if unit == "m":
-            bantime = int(time.time() + int(time_num) * 60)
+            bantime = int(time.time()) + int(time_num) * 60
         elif unit == "h":
-            bantime = int(time.time() + int(time_num) * 60 * 60)
+            bantime = int(time.time()) + int(time_num) * 60 * 60
         elif unit == "d":
-            bantime = int(time.time() + int(time_num) * 24 * 60 * 60)
+            bantime = int(time.time()) + int(time_num) * 24 * 60 * 60
         else:
             # how even...?
             return ""
