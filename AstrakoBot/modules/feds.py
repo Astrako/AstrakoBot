@@ -371,6 +371,11 @@ def user_join_fed(update: Update, context: CallbackContext):
             LOGGER.warning("error")
         getuser = sql.search_user_in_fed(fed_id, user_id)
         fed_id = sql.get_fed_id(chat.id)
+        if not fed_id:
+            update.effective_message.reply_text(
+                "This group is not in any federation!"
+            )
+            return
         info = sql.get_fed_info(fed_id)
         get_owner = ast.literal_eval(info["fusers"])["owner"]
         get_owner = bot.get_chat(get_owner).id
