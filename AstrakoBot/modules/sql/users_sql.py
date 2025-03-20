@@ -218,7 +218,7 @@ def del_user(user_id):
             SESSION.commit()
             return True
 
-        ChatMembers.query.filter(ChatMembers.user == user_id).delete()
+        SESSION.query(ChatMembers).filter(ChatMembers.user == user_id).delete()
         SESSION.commit()
         SESSION.close()
     return False
