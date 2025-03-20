@@ -140,9 +140,7 @@ def get_welcome_type(msg: Message):
     argumen = None
     # determine what the contents of the filter are - text, image, sticker, etc
     if msg.reply_to_message:
-        argumen = (
-            msg.reply_to_message.caption if msg.reply_to_message.caption else ""
-        )
+        argumen = msg.reply_to_message.caption or msg.reply_to_message.text or ""
         offset = 0  # offset is no need since target was in reply
         entities = msg.reply_to_message.parse_entities()
     elif args and len(args) > 1:
