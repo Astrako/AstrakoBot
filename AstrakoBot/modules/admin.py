@@ -404,7 +404,7 @@ def adminlist(update: Update, context: CallbackContext):
         status = admin.status
         custom_title = admin.custom_title
 
-        if user.first_name == "":
+        if not user.first_name:
             name = "☠ Deleted Account"
         else:
             name = "{}".format(
@@ -430,7 +430,7 @@ def adminlist(update: Update, context: CallbackContext):
         status = admin.status
         custom_title = admin.custom_title
 
-        if user.first_name == "":
+        if not user.first_name:
             name = "☠ Deleted Account"
         else:
             name = "{}".format(

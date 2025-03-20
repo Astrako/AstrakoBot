@@ -407,7 +407,7 @@ def whitelistlist(update: Update, context: CallbackContext):
         user_id = int(each_user)
         try:
             user = bot.get_chat(user_id)
-            if user.first_name == "":
+            if not user.first_name:
                 continue
             msg += f"• {mention_html(user_id, html.escape(user.first_name))}\n"
         except TelegramError:
@@ -424,7 +424,7 @@ def supportlist(update: Update, context: CallbackContext):
         user_id = int(each_user)
         try:
             user = bot.get_chat(user_id)
-            if user.first_name == "":
+            if not user.first_name:
                 continue
             msg += f"• {mention_html(user_id, html.escape(user.first_name))}\n"
         except TelegramError:
@@ -442,7 +442,7 @@ def sudolist(update: Update, context: CallbackContext):
         user_id = int(each_user)
         try:
             user = bot.get_chat(user_id)
-            if user.first_name == "":
+            if not user.first_name:
                 continue
             msg += f"• {mention_html(user_id, html.escape(user.first_name))}\n"
         except TelegramError:
@@ -460,7 +460,7 @@ def devlist(update: Update, context: CallbackContext):
         user_id = int(each_user)
         try:
             user = bot.get_chat(user_id)
-            if user.first_name == "":
+            if not user.first_name:
                 continue
             msg += f"• {mention_html(user_id, html.escape(user.first_name))}\n"
         except TelegramError:
