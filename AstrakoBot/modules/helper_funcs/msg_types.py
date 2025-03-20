@@ -137,20 +137,21 @@ def get_welcome_type(msg: Message):
         data_type = Types.VIDEO_NOTE
 
     buttons = []
+    argumen = None
     # determine what the contents of the filter are - text, image, sticker, etc
-    if args:
-        if msg.reply_to_message:
-            argumen = (
-                msg.reply_to_message.caption if msg.reply_to_message.caption else ""
-            )
-            offset = 0  # offset is no need since target was in reply
-            entities = msg.reply_to_message.parse_entities()
-        else:
-            argumen = args[1]
-            offset = len(argumen) - len(
-                msg.text
-            )  # set correct offset relative to command + notename
-            entities = msg.parse_entities()
+    if msg.reply_to_message:
+        argumen = (
+            msg.reply_to_message.caption if msg.reply_to_message.caption else ""
+        )
+        offset = 0  # offset is no need since target was in reply
+        entities = msg.reply_to_message.parse_entities()
+    elif args and len(args) > 1:
+        argumen = args[1]
+        offset = len(argumen) - len(
+            msg.text
+        )  # set correct offset relative to command + notename
+        entities = msg.parse_entities()
+    if argumen:
         text, buttons = button_markdown_parser(
             argumen, entities=entities, offset=offset
         )
