@@ -403,15 +403,21 @@ def whitelistlist(update: Update, context: CallbackContext):
     bot = context.bot
     message = update.effective_message
     msg = "<b>Whitelist users:</b>\n"
+    zombies = []
     for each_user in WHITELIST_USERS:
         user_id = int(each_user)
         try:
             user = bot.get_chat(user_id)
             if not user.first_name:
+                zombies.append(user_id)
                 continue
             msg += f"• {mention_html(user_id, html.escape(user.first_name))}\n"
         except TelegramError:
             pass
+    if zombies:
+        msg += "\n<b>Zombies:</b>\n"
+        for user_id in zombies:
+            msg += f"• {mention_html(user_id, html.escape(str(user_id)))}\n"
     message.reply_text(msg, parse_mode=ParseMode.HTML)
 
 
@@ -420,15 +426,21 @@ def supportlist(update: Update, context: CallbackContext):
     bot = context.bot
     message = update.effective_message
     msg = "<b>Support users:</b>\n"
+    zombies = []
     for each_user in SUPPORT_USERS:
         user_id = int(each_user)
         try:
             user = bot.get_chat(user_id)
             if not user.first_name:
+                zombies.append(user_id)
                 continue
             msg += f"• {mention_html(user_id, html.escape(user.first_name))}\n"
         except TelegramError:
             pass
+    if zombies:
+        msg += "\n<b>Zombies:</b>\n"
+        for user_id in zombies:
+            msg += f"• {mention_html(user_id, html.escape(str(user_id)))}\n"
     message.reply_text(msg, parse_mode=ParseMode.HTML)
 
 
@@ -438,15 +450,21 @@ def sudolist(update: Update, context: CallbackContext):
     message = update.effective_message
     true_sudo = list(set(SUDO_USERS) - set(DEV_USERS))
     msg = "<b>Sudo users:</b>\n"
+    zombies = []
     for each_user in true_sudo:
         user_id = int(each_user)
         try:
             user = bot.get_chat(user_id)
             if not user.first_name:
+                zombies.append(user_id)
                 continue
             msg += f"• {mention_html(user_id, html.escape(user.first_name))}\n"
         except TelegramError:
             pass
+    if zombies:
+        msg += "\n<b>Zombies:</b>\n"
+        for user_id in zombies:
+            msg += f"• {mention_html(user_id, html.escape(str(user_id)))}\n"
     message.reply_text(msg, parse_mode=ParseMode.HTML)
 
 
@@ -456,15 +474,21 @@ def devlist(update: Update, context: CallbackContext):
     message = update.effective_message
     true_dev = list(set(DEV_USERS) - {OWNER_ID})
     msg = "<b>Developer users:</b>\n"
+    zombies = []
     for each_user in true_dev:
         user_id = int(each_user)
         try:
             user = bot.get_chat(user_id)
             if not user.first_name:
+                zombies.append(user_id)
                 continue
             msg += f"• {mention_html(user_id, html.escape(user.first_name))}\n"
         except TelegramError:
             pass
+    if zombies:
+        msg += "\n<b>Zombies:</b>\n"
+        for user_id in zombies:
+            msg += f"• {mention_html(user_id, html.escape(str(user_id)))}\n"
     message.reply_text(msg, parse_mode=ParseMode.HTML)
 
 
