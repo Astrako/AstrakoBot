@@ -54,6 +54,10 @@ support_chat = os.getenv("SUPPORT_CHAT")
 @dev_plus
 def logs(update: Update, context: CallbackContext):
     user = update.effective_user
+    if os.path.getsize('log.txt') > (45 * 1024 * 1024):
+        update.effective_message.reply_text("Log file is too big to be sent!")
+        return
+
     with open("log.txt", "rb") as f:
         context.bot.send_document(document=f, filename=f.name, chat_id=user.id)
 
