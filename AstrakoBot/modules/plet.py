@@ -24,10 +24,16 @@ from AstrakoBot.modules.thonkify_dict import thonkifydict
 def plet(update: Update, context: CallbackContext):
     chat = update.effective_chat
     message = update.effective_message
-    if not message.reply_to_message:
+
+    msg = ""
+    if context.args:
         msg = message.text.split(None, 1)[1]
-    else:
-        msg = message.reply_to_message.text
+    elif message.reply_to_message:
+        msg = message.reply_to_message.caption or message.reply_to_message.text or ""
+
+    if not msg:
+        message.reply_text("What should i plet?")
+        return
 
     # the processed photo becomes too long and unreadable + the telegram doesn't support any longer dimensions + you have the lulz.
     if (len(msg)) > 39:
@@ -62,12 +68,17 @@ def plet(update: Update, context: CallbackContext):
 
     maxsize = 1024, 896
     if image.size[0] > maxsize[0]:
-        image.thumbnail(maxsize, Image.ANTIALIAS)
+        attr = Image.ANTIALIAS if hasattr(Image, 'ANTIALIAS') else Image.Resampling.LANCZOS
+        image.thumbnail(maxsize, attr)
 
     # put processed image in a buffer and then upload cause async
     with BytesIO() as buffer:
         buffer.name = "image.png"
-        image.save(buffer, "PNG")
+        try:
+            image.save(buffer, "PNG")
+        except SystemError:
+            message.reply_text("Invalid characters detected. Try again with something readable.")
+            return
         buffer.seek(0)
         delmsg = context.bot.send_sticker(chat_id=message.chat_id, sticker=buffer)
 
