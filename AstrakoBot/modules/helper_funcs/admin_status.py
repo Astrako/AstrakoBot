@@ -4,6 +4,7 @@ from cachetools import TTLCache
 
 from telegram import Chat, ChatMember, TelegramError, Update
 from telegram.ext import CallbackContext, ChatMemberHandler
+from telegram.error import Unauthorized
 
 from AstrakoBot import SUDO_USERS, dispatcher
 
@@ -41,7 +42,10 @@ def get_mem_from_cache(user_id: int, chat_id: int) -> ChatMember:
 					return i
 
 		except KeyError:
-			admins = dispatcher.bot.getChatAdministrators(chat_id)
+			try:
+				admins = dispatcher.bot.getChatAdministrators(chat_id)
+			except Unauthorized:
+				return None
 			USER_ADMIN_CACHE[chat_id] = admins
 			for i in admins:
 				if i.user.id == user_id:

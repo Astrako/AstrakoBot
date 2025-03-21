@@ -19,7 +19,6 @@ from AstrakoBot.modules.helper_funcs.chat_status import (
     bot_admin,
     can_restrict,
     connection_status,
-    is_user_admin,
     is_user_ban_protected,
     is_user_in_chat,
     user_admin,
@@ -27,6 +26,7 @@ from AstrakoBot.modules.helper_funcs.chat_status import (
     can_delete,
     is_bot_admin,
 )
+from AstrakoBot.modules.helper_funcs.admin_status import user_is_admin
 from AstrakoBot.modules.helper_funcs.extraction import extract_user_and_text
 from AstrakoBot.modules.helper_funcs.string_handling import extract_time
 from AstrakoBot.modules.log_channel import gloggable, loggable
@@ -295,7 +295,7 @@ def punch(update: Update, context: CallbackContext) -> str:
 @can_restrict
 def punchme(update: Update, context: CallbackContext):
     user_id = update.effective_message.from_user.id
-    if is_user_admin(update.effective_chat, user_id):
+    if user_is_admin(update.effective_chat, user_id):
         update.effective_message.reply_text("I wish I could... but you're an admin.")
         return
 

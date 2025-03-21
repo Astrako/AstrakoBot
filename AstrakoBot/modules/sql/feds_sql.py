@@ -184,7 +184,7 @@ def get_user_fbanlist(user_id):
     fedname = []
     for x in banlist:
         if banlist[x].get(user_id):
-            if user_name == "":
+            if not user_name:
                 user_name = banlist[x][user_id].get("first_name")
             fedname.append([x, banlist[x][user_id].get("reason")])
     return user_name, fedname

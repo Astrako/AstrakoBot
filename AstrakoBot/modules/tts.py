@@ -1,7 +1,9 @@
+import uuid
 import os
 from datetime import datetime
 from typing import List
 from gtts import gTTS
+from gtts.tts import gTTSError
 from telegram import Update, ChatAction, ParseMode
 
 from AstrakoBot.modules.sql.clear_cmd_sql import get_clearcmd
@@ -12,47 +14,53 @@ from AstrakoBot.modules.helper_funcs.misc import delete
 
 
 def tts(update: Update, context: CallbackContext):
-    args = context.args
     message = update.effective_message
     chat = update.effective_chat
-    delmsg = ""
+    args = context.args
+    delmsg = None
 
+    text = ""
     if message.reply_to_message:
-        delmsg = message.reply_to_message.text
-
-    if args:
-        delmsg = "  ".join(args).lower()
-
-        current_time = datetime.strftime(datetime.now(), "%d.%m.%Y %H:%M:%S")
-        filename = datetime.now().strftime("%d%m%y-%H%M%S%f")
-        update.message.chat.send_action(ChatAction.RECORD_AUDIO)
-        lang = "ml"
-        tts = gTTS(delmsg, lang)
-        tts.save("k.mp3")
-        with open("k.mp3", "rb") as f:
-            linelist = list(f)
-            linecount = len(linelist)
-        if linecount == 1:
-            update.message.chat.send_action(ChatAction.RECORD_AUDIO)
-            lang = "en"
-            tts = gTTS(delmsg, lang)
-            tts.save("k.mp3")
-        with open("k.mp3", "rb") as speech:
-            delmsg = update.message.reply_voice(speech, quote=False)
-
-        os.remove("k.mp3")
-
+        text = message.reply_to_message.text or message.reply_to_message.caption or ""
+    elif args:
+        text = "  ".join(args).lower()
     else:
-        delmsg = message.reply_text(
-        "Reply a message or give something like:\n`/tts <message>`",
-        parse_mode = ParseMode.MARKDOWN
+        message.reply_text(
+            "Reply to a message or use: /tts <message>",
+            parse_mode=ParseMode.MARKDOWN
         )
+        return
 
-    cleartime = get_clearcmd(chat.id, "tts")
+    if not text.strip():
+        message.reply_text("Please provide valid text to convert to speech.")
+        return
 
-    if cleartime:
-        context.dispatcher.run_async(delete, delmsg, cleartime.time)
+    filename = f"tts_{uuid.uuid4()}.mp3"
 
+    try:
+        message.chat.send_action(ChatAction.RECORD_AUDIO)
+
+        tts = gTTS(text=text, lang='en', tld='com', timeout=60)
+        tts.save(filename)
+
+        with open(filename, 'rb') as audio_file:
+            delmsg = message.reply_voice(
+                voice=audio_file,
+                quote=False
+            )
+
+        try:
+            os.remove(filename)
+        except:
+            pass
+
+        cleartime = get_clearcmd(chat.id, "tts")
+
+        if cleartime:
+            context.dispatcher.run_async(delete, delmsg, cleartime.time)
+
+    except:
+        message.reply_text("Failed to connect to the TTS service. Please try again later.")
 
 
 TTS_HANDLER = DisableAbleCommandHandler("tts", tts, run_async=True)

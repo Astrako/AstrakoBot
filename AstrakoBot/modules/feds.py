@@ -21,7 +21,6 @@ from AstrakoBot.modules.disable import DisableAbleCommandHandler
 from AstrakoBot.modules.helper_funcs.admin_status import get_bot_member, user_is_admin
 from AstrakoBot.modules.helper_funcs.alternate import send_message
 from AstrakoBot.modules.helper_funcs.chat_status import (
-    is_user_admin,
     can_delete,
 )
 from AstrakoBot.modules.helper_funcs.extraction import (
@@ -29,6 +28,7 @@ from AstrakoBot.modules.helper_funcs.extraction import (
     extract_user,
     extract_user_fban,
 )
+from AstrakoBot.modules.helper_funcs.admin_status import user_is_admin
 from AstrakoBot.modules.helper_funcs.string_handling import markdown_parser
 from telegram import (
     Chat, InlineKeyboardButton,
@@ -94,13 +94,13 @@ def new_fed(update: Update, context: CallbackContext):
             "Federations can only be created by privately messaging me."
         )
         return
-    if len(message.text) == 1:
+    if not context.args:
         send_message(
             update.effective_message, "Please write the name of the federation!"
         )
         return
     fednam = message.text.split(None, 1)[1]
-    if not fednam == "":
+    if fednam:
         fed_id = str(uuid.uuid4())
         fed_name = fednam
         LOGGER.info(fed_id)
@@ -212,7 +212,7 @@ def fed_chat(update: Update, context: CallbackContext):
     fed_id = sql.get_fed_id(chat.id)
 
     user_id = update.effective_message.from_user.id
-    if not is_user_admin(update.effective_chat, user_id):
+    if not user_is_admin(update.effective_chat, user_id):
         update.effective_message.reply_text(
             "You must be an admin to execute this command"
         )
@@ -352,25 +352,18 @@ def user_join_fed(update: Update, context: CallbackContext):
 
     if is_user_fed_owner(fed_id, user.id) or user.id in SUDO_USERS:
         user_id = extract_user(msg, args)
-        if user_id:
-            user = bot.get_chat(user_id)
-        elif not msg.reply_to_message and not args:
-            user = msg.from_user
-        elif not msg.reply_to_message and (
-            not args
-            or (
-                len(args) >= 1
-                and not args[0].startswith("@")
-                and not args[0].isdigit()
-                and not msg.parse_entities([MessageEntity.TEXT_MENTION])
-            )
-        ):
-            msg.reply_text("I cannot extract user from this message")
+        if not user_id:
+            msg.reply_text("Who are you trying to promote?")
             return
-        else:
-            LOGGER.warning("error")
+        user = bot.get_chat(user_id)
+
         getuser = sql.search_user_in_fed(fed_id, user_id)
         fed_id = sql.get_fed_id(chat.id)
+        if not fed_id:
+            update.effective_message.reply_text(
+                "This group is not in any federation!"
+            )
+            return
         info = sql.get_fed_info(fed_id)
         get_owner = ast.literal_eval(info["fusers"])["owner"]
         get_owner = bot.get_chat(get_owner).id
@@ -412,28 +405,13 @@ def user_demote_fed(update: Update, context: CallbackContext):
 
     fed_id = sql.get_fed_id(chat.id)
 
-    if is_user_fed_owner(fed_id, user.id):
+    if is_user_fed_owner(fed_id, user.id) or user.id in SUDO_USERS:
         msg = update.effective_message
         user_id = extract_user(msg, args)
-        if user_id:
-            user = bot.get_chat(user_id)
-
-        elif not msg.reply_to_message and not args:
-            user = msg.from_user
-
-        elif not msg.reply_to_message and (
-            not args
-            or (
-                len(args) >= 1
-                and not args[0].startswith("@")
-                and not args[0].isdigit()
-                and not msg.parse_entities([MessageEntity.TEXT_MENTION])
-            )
-        ):
-            msg.reply_text("I cannot extract user from this message")
+        if not user_id:
+            msg.reply_text("Who are you trying to demote?")
             return
-        else:
-            LOGGER.warning("error")
+        user = bot.get_chat(user_id)
 
         if user_id == bot.id:
             update.effective_message.reply_text(
@@ -670,7 +648,7 @@ def fed_ban(update: Update, context: CallbackContext):
         # starting = "The reason fban is replaced for {} in the Federation <b>{}</b>.".format(user_target, fed_name)
         # send_message(update.effective_message, starting, parse_mode=ParseMode.HTML)
 
-        # if reason == "":
+        # if not reason:
         #    reason = "No reason given."
 
         temp = sql.un_fban_user(fed_id, fban_user_id)
@@ -888,7 +866,7 @@ def fed_ban(update: Update, context: CallbackContext):
     #    user_target, fed_name)
     # update.effective_message.reply_text(starting, parse_mode=ParseMode.HTML)
 
-    # if reason == "":
+    # if not reason:
     #    reason = "No reason given."
 
     x = sql.fban_user(
@@ -1812,7 +1790,7 @@ def fed_import_bans(update: Update, context: CallbackContext):
                 reading = file.read().decode("UTF-8")
                 splitting = reading.split("\n")
                 for x in splitting:
-                    if x == "":
+                    if not x:
                         continue
                     try:
                         data = json.loads(x)
@@ -2008,7 +1986,7 @@ def fed_stat_user(update: Update, context: CallbackContext):
                     parse_mode="markdown",
                 )
                 return
-            if user_name == "" or user_name is None:
+            if not user_name:
                 user_name = "He/she"
             if not reason:
                 send_message(
@@ -2022,12 +2000,12 @@ def fed_stat_user(update: Update, context: CallbackContext):
                 send_message(update.effective_message, teks, parse_mode="markdown")
             return
         user_name, fbanlist = sql.get_user_fbanlist(str(user_id))
-        if user_name == "":
+        if not user_name:
             try:
                 user_name = bot.get_chat(user_id).first_name
             except BadRequest:
                 user_name = "He/she"
-            if user_name == "" or user_name is None:
+            if not user_name:
                 user_name = "He/she"
         if len(fbanlist) == 0:
             send_message(
@@ -2045,7 +2023,7 @@ def fed_stat_user(update: Update, context: CallbackContext):
     elif not msg.reply_to_message and not args:
         user_id = msg.from_user.id
         user_name, fbanlist = sql.get_user_fbanlist(user_id)
-        if user_name == "":
+        if not user_name:
             user_name = msg.from_user.first_name
         if len(fbanlist) == 0:
             send_message(

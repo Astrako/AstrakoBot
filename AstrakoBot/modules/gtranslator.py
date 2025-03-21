@@ -154,7 +154,7 @@ def totranslate(update: Update, context: CallbackContext):
         elif reply.text:
             text = reply.text
 
-    if text == "":
+    if not text:
         delmsg = message.reply_text(
             "Reply to messages from other languages for translating into the intended language\n\n"
             "Example: `/tr en-ml` to translate from English to Malayalam\n"
@@ -210,7 +210,7 @@ def totranslate(update: Update, context: CallbackContext):
 
     reply_msg = message.reply_text("Translating to {}...".format(languages[targetLang]))
     translated = tr(text, srcLang, targetLang)
-    if translated == "":
+    if not translated:
         reply_msg.edit_text("Failed to translate to {}. Try again in a few seconds or try another target language!".format(languages[targetLang]))
         return
     reply_msg.edit_text("Translated to {}:\n\n".format(languages[targetLang]) + translated)

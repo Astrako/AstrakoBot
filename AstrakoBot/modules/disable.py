@@ -22,9 +22,9 @@ if is_module_loaded(FILENAME):
 
     from AstrakoBot.modules.helper_funcs.chat_status import (
         connection_status,
-        is_user_admin,
         user_admin,
     )
+    from AstrakoBot.modules.helper_funcs.admin_status import user_is_admin
     from AstrakoBot.modules.sql import disable_sql as sql
     from telegram.ext.dispatcher import run_async
 
@@ -78,7 +78,7 @@ if is_module_loaded(FILENAME):
                                 # check if command was disabled
                                 is_disabled = command[
                                     0
-                                ] in ADMIN_CMDS and is_user_admin(chat, user.id)
+                                ] in ADMIN_CMDS and user_is_admin(chat, user.id)
                                 if not is_disabled:
                                     return None
                                 else:

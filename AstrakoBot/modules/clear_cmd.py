@@ -4,7 +4,7 @@ from telegram.ext import CommandHandler, CallbackContext, run_async
 import AstrakoBot.modules.sql.clear_cmd_sql as sql
 from AstrakoBot import dispatcher
 from AstrakoBot.modules.helper_funcs.chat_status import user_admin, connection_status
-
+from AstrakoBot.modules.helper_funcs.string_handling import parse_to_seconds
 
 @user_admin
 @connection_status
@@ -28,7 +28,7 @@ def clearcmd(update: Update, context: CallbackContext):
     "lyrics",
     "magisk",
     "miui",
-    "notes",    
+    "notes",
     "orangefox",
     "phh",
     "ping",
@@ -53,7 +53,7 @@ def clearcmd(update: Update, context: CallbackContext):
         if commands:
             msg += "*Command - Time*\n"
             for cmd in commands:
-                msg += f"`{cmd.cmd} - {cmd.time} secs`\n"  
+                msg += f"`{cmd.cmd} - {cmd.time} secs`\n"
         else:
             msg = f"No deletion time has been set for any command in *{chat.title}*"
 
@@ -83,14 +83,17 @@ def clearcmd(update: Update, context: CallbackContext):
             if time == "restore":
                 sql.del_clearcmd(chat.id, cmd)
                 msg = f"Removed `{cmd}` from list"
-            elif (5 <= int(time) <= 300):
-                sql.set_clearcmd(chat.id, cmd, time)
-                msg = f"`{cmd}` output will be deleted after *{time}* seconds in *{chat.title}*"
             else:
-               msg = "Time must be between 5 and 300 seconds"
+                time = parse_to_seconds(time)
+                if not time:
+                    msg = "Time must be in seconds or minutes"
+                elif (5 <= time <= 300):
+                    sql.set_clearcmd(chat.id, cmd, time)
+                    msg = f"`{cmd}` output will be deleted after *{time}* seconds in *{chat.title}*"
+                else:
+                    msg = "Time must be between 5 and 300 seconds"
         else:
             msg = "Specify a valid command. Use `/clearcmd list` to see available commands"
-                
     else:
         msg = "I don't understand what are you trying to do. Check module help for more details"
 

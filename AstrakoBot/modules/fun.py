@@ -5,15 +5,13 @@ import time
 import AstrakoBot.modules.fun_strings as fun_strings
 from AstrakoBot import dispatcher
 from AstrakoBot.modules.disable import DisableAbleCommandHandler
-from AstrakoBot.modules.helper_funcs.chat_status import is_user_admin
+from AstrakoBot.modules.helper_funcs.admin_status import user_is_admin
 from AstrakoBot.modules.helper_funcs.extraction import extract_user
 from AstrakoBot.modules.helper_funcs.misc import delete
 from AstrakoBot.modules.sql.clear_cmd_sql import get_clearcmd
 from telegram import ChatPermissions, ParseMode, Update
 from telegram.error import BadRequest
 from telegram.ext import CallbackContext, run_async
-
-GIF_ID = "CgACAgQAAx0CSVUvGgAC7KpfWxMrgGyQs-GUUJgt-TSO8cOIDgACaAgAAlZD0VHT3Zynpr5nGxsE"
 
 
 def runs(update: Update, context: CallbackContext):
@@ -27,12 +25,17 @@ def sanitize(update: Update, context: CallbackContext):
         if message.reply_to_message
         else message.from_user.first_name
     )
-    reply_animation = (
-        message.reply_to_message.reply_animation
+
+    reply_msg = (
+        message.reply_to_message
         if message.reply_to_message
-        else message.reply_animation
+        else message
     )
-    deletion(update, context, reply_animation(random.choice(fun_strings.GIFS), caption=f"*Sanitizes {name}*"))
+
+    try:
+        deletion(update, context, reply_msg.reply_animation(random.choice(fun_strings.GIFS), caption=f"*Sanitizes {name}*"))
+    except BadRequest:
+        deletion(update, context, reply_msg.reply_text(f"*Sanitizes {name}*"))
 
 
 def slap(update: Update, context: CallbackContext):
@@ -54,7 +57,7 @@ def slap(update: Update, context: CallbackContext):
 
         if isinstance(temp, list):
             if temp[2] == "tmute":
-                if is_user_admin(chat, message.from_user.id):
+                if user_is_admin(chat, message.from_user.id):
                     reply_text(temp[1])
                     return
 
@@ -137,20 +140,6 @@ def roll(update: Update, context: CallbackContext):
     deletion(update, context, update.message.reply_text(random.choice(range(1, 7))))
 
 
-def shout(update: Update, context: CallbackContext):
-    args = context.args
-    text = " ".join(args)
-    result = []
-    result.append(" ".join(list(text)))
-    for pos, symbol in enumerate(text[1:]):
-        result.append(symbol + " " + "  " * pos + symbol)
-    result = list("\n".join(result))
-    result[0] = text[0]
-    result = "".join(result)
-    msg = "```\n" + result + "```"
-    deletion(update, context, update.effective_message.reply_text(msg, parse_mode="MARKDOWN"))
-
-
 def toss(update: Update, context: CallbackContext):
     deletion(update, context, update.message.reply_text(random.choice(fun_strings.TOSS)))
 
@@ -212,90 +201,6 @@ def table(update: Update, context: CallbackContext):
     deletion(update, context, reply_text(random.choice(fun_strings.TABLE)))
 
 
-normiefont = [
-    "a",
-    "b",
-    "c",
-    "d",
-    "e",
-    "f",
-    "g",
-    "h",
-    "i",
-    "j",
-    "k",
-    "l",
-    "m",
-    "n",
-    "o",
-    "p",
-    "q",
-    "r",
-    "s",
-    "t",
-    "u",
-    "v",
-    "w",
-    "x",
-    "y",
-    "z",
-]
-weebyfont = [
-    "卂",
-    "乃",
-    "匚",
-    "刀",
-    "乇",
-    "下",
-    "厶",
-    "卄",
-    "工",
-    "丁",
-    "长",
-    "乚",
-    "从",
-    "𠘨",
-    "口",
-    "尸",
-    "㔿",
-    "尺",
-    "丂",
-    "丅",
-    "凵",
-    "リ",
-    "山",
-    "乂",
-    "丫",
-    "乙",
-]
-
-
-def weebify(update: Update, context: CallbackContext):
-    args = context.args
-    message = update.effective_message
-    string = ""
-
-    if message.reply_to_message:
-        string = message.reply_to_message.text.lower().replace(" ", "  ")
-
-    if args:
-        string = "  ".join(args).lower()
-
-    if not string:
-        deletion(update, context, message.reply_text("Usage is `/weebify <text>`", parse_mode=ParseMode.MARKDOWN))
-        return
-
-    for normiecharacter in string:
-        if normiecharacter in normiefont:
-            weebycharacter = weebyfont[normiefont.index(normiecharacter)]
-            string = string.replace(normiecharacter, weebycharacter)
-
-    if message.reply_to_message:
-        deletion(update, context, message.reply_to_message.reply_text(string))
-    else:
-        deletion(update, context, message.reply_text(string))
-
-
 def deletion(update: Update, context: CallbackContext, delmsg):
     chat = update.effective_chat
     cleartime = get_clearcmd(chat.id, "fun")
@@ -335,11 +240,7 @@ RLG_HANDLER = DisableAbleCommandHandler("rlg", rlg, run_async=True)
 DECIDE_HANDLER = DisableAbleCommandHandler("decide", decide, run_async=True)
 EIGHTBALL_HANDLER = DisableAbleCommandHandler("8ball", eightball, run_async=True)
 TABLE_HANDLER = DisableAbleCommandHandler("table", table, run_async=True)
-SHOUT_HANDLER = DisableAbleCommandHandler("shout", shout, run_async=True)
-WEEBIFY_HANDLER = DisableAbleCommandHandler("weebify", weebify, run_async=True)
 
-dispatcher.add_handler(WEEBIFY_HANDLER)
-dispatcher.add_handler(SHOUT_HANDLER)
 dispatcher.add_handler(SANITIZE_HANDLER)
 dispatcher.add_handler(RUNS_HANDLER)
 dispatcher.add_handler(SLAP_HANDLER)
@@ -366,8 +267,6 @@ __command_list__ = [
     "table",
     "pat",
     "sanitize",
-    "shout",
-    "weebify",
     "8ball",
 ]
 __handlers__ = [
@@ -382,7 +281,5 @@ __handlers__ = [
     DECIDE_HANDLER,
     TABLE_HANDLER,
     SANITIZE_HANDLER,
-    SHOUT_HANDLER,
-    WEEBIFY_HANDLER,
     EIGHTBALL_HANDLER,
 ]

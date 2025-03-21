@@ -123,7 +123,7 @@ def youtube(update: Update, context: CallbackContext):
         msg = message.reply_text("Downloading as video, Please wait...")
         ret = dyt_video(yt, res, filename)
         caption = "Type: mp4\nQuality: {}".format(res)
-        if ret == "":
+        if not ret:
             msg.edit_text("Uploading...")
             with open(filename, "rb") as video:
                 context.bot.send_video(chat_id=chat_id, video=video, caption=caption, reply_to_message_id=message_id)
@@ -136,7 +136,7 @@ def youtube(update: Update, context: CallbackContext):
         msg = message.reply_text("Downloading as mp3 audio, Please wait...")
         ret = dyt_audio(yt, filename)
         caption = "Type: mp3\nQuality: 128kbps".format(res)
-        if ret == "":
+        if not ret:
             msg.edit_text("Uploading...")
             with open(filename, "rb") as audio:
                 context.bot.send_audio(chat_id=chat_id, audio=audio, caption=caption.format(type), reply_to_message_id=message_id)

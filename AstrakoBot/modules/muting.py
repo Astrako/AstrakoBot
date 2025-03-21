@@ -6,7 +6,6 @@ from AstrakoBot.modules.helper_funcs.chat_status import (
     bot_admin,
     can_restrict,
     connection_status,
-    is_user_admin,
     user_admin,
     can_delete,
 )
@@ -16,6 +15,8 @@ from AstrakoBot.modules.helper_funcs.extraction import (
 )
 from AstrakoBot.modules.helper_funcs.string_handling import extract_time
 from AstrakoBot.modules.log_channel import loggable
+from AstrakoBot.modules.helper_funcs.admin_status import get_bot_member, user_is_admin
+
 from telegram import Bot, Chat, ChatPermissions, ParseMode, Update
 from telegram.error import BadRequest
 from telegram.ext import CallbackContext, CommandHandler, run_async
@@ -40,7 +41,7 @@ def check_user(user_id: int, bot: Bot, chat: Chat) -> Optional[str]:
         reply = "I'm not gonna MUTE myself, How high are you?"
         return reply
 
-    if is_user_admin(chat, user_id, member):
+    if user_is_admin(chat, user_id):
         reply = "Can't. Find someone else to mute but not this one."
         return reply
 
@@ -90,6 +91,12 @@ def mute(update: Update, context: CallbackContext) -> str:
 
     if member.can_send_messages is None or member.can_send_messages:
         chat_permissions = ChatPermissions(can_send_messages=False)
+        if not get_bot_member(chat.id).can_restrict_members:
+            if not silent:
+                bot.sendMessage(chat.id, "I can't restrict people here!")
+            else:
+                message.delete()
+            return log
         bot.restrict_chat_member(chat.id, user_id, chat_permissions)
         if not silent:
             reply = (
@@ -150,6 +157,9 @@ def unmute(update: Update, context: CallbackContext) -> str:
         ):
             if not silent:
                 message.reply_text("This user already has the right to speak.")
+        elif not get_bot_member(chat.id).can_restrict_members:
+            if not silent:
+                bot.sendMessage(chat.id, "I can't restrict people here!")
         else:
             chat_permissions = ChatPermissions(
                 can_send_messages=True,

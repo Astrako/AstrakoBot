@@ -57,7 +57,14 @@ def import_data(update: Update, context: CallbackContext):
         with BytesIO() as file:
             file_info.download(out=file)
             file.seek(0)
-            data = json.load(file)
+            try:
+                data = json.load(file)
+            except json.decoder.JSONDecodeError:
+                msg.reply_text("Backup seems to be invalid or corrupted!")
+                return
+            except UnicodeDecodeError:
+                msg.reply_text("This is not a backup file!")
+                return
 
         # only import one group
         if len(data) > 1 and str(chat.id) not in data:
@@ -115,6 +122,8 @@ def import_data(update: Update, context: CallbackContext):
         else:
             text = "Backup fully restored"
         msg.reply_text(text, parse_mode="markdown")
+    else:
+        msg.reply_text("Reply to a valid backup file!")
 
 
 @user_admin
