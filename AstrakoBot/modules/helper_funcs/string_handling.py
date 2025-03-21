@@ -272,11 +272,24 @@ def extract_time(message, time_val):
         return bantime
     else:
         message.reply_text(
-            "Invalid time type specified. Expected m,h, or d, got: {}".format(
+            "Invalid time type specified. Expected m, h, or d, got: {}".format(
                 time_val[-1]
             )
         )
         return ""
+
+
+def parse_to_seconds(time_str):
+    if time_str.isdigit():
+        return int(time_str) or None
+
+    match = re.match(r"\s*([\d.]+)\s*([a-z]*)\s*", time_str, re.IGNORECASE)
+    if len(time_str) > 50 or not match:
+        return None
+
+    value, unit = float(match[1]), match[2].lower()
+    multipliers = {'d': 86400, 'h': 3600, 'm': 60, 's': 1}
+    return int(value * multipliers.get(unit[:1], 0)) or None
 
 
 def markdown_to_html(text):
