@@ -270,13 +270,13 @@ def orangefox(update: Update, context: CallbackContext):
     if device:
         link = get(f"https://api.orangefox.download/v3/releases/?codename={device}&sort=date_desc&limit=1")
 
-        if link.status_code == 404:
+        page = loads(link.content)
+        file_id = page["data"][0]["_id"] if "data" in page else ""
+        link = get(f"https://api.orangefox.download/v3/devices/get?codename={device}")
+        page = loads(link.content)
+        if "detail" in page and page["detail"] == "Not Found":
             msg = f"OrangeFox recovery is not avaliable for {device}"
         else:
-            page = loads(link.content)
-            file_id = page["data"][0]["_id"]
-            link = get(f"https://api.orangefox.download/v3/devices/get?codename={device}")
-            page = loads(link.content)
             oem = page["oem_name"]
             model = page["model_name"]
             full_name = page["full_name"]
