@@ -33,7 +33,7 @@ from telegram import (
 
 
 def getphh(index):
-    recentRelease = api.getReleaseData(api.getData("phhusson/treble_experimentations"), index)
+    recentRelease = api.getReleaseData(api.getData("TrebleDroid/treble_experimentations"), index)
     if recentRelease is None:
         return "The specified release could not be found"
     author = api.getAuthor(recentRelease)
