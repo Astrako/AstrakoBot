@@ -990,13 +990,24 @@ def user_button(update: Update, context: CallbackContext):
             pass
         if member_dict["should_welc"]:
             if member_dict["media_wel"]:
-                sent = ENUM_FUNC_MAP[member_dict["welc_type"]](
-                    member_dict["chat_id"],
-                    member_dict["cust_content"],
-                    caption=member_dict["res"],
-                    reply_markup=member_dict["keyboard"],
-                    parse_mode="markdown",
-                )
+                if welc_type == sql.Types.STICKER:
+                    sent = ENUM_FUNC_MAP[member_dict["welc_type"]](
+                        member_dict["chat_id"],
+                        member_dict["cust_content"],
+                        reply_markup=member_dict["keyboard"],
+                    ) and ENUM_FUNC_MAP[sql.Types.TEXT](
+                        member_dict["chat_id"],
+                        member_dict["res"],
+                        parse_mode="markdown",
+                    )
+                else:
+                    sent = ENUM_FUNC_MAP[member_dict["welc_type"]](
+                        member_dict["chat_id"],
+                        member_dict["cust_content"],
+                        caption=member_dict["res"],
+                        reply_markup=member_dict["keyboard"],
+                        parse_mode="markdown",
+                    )
             else:
                 sent = send(
                     member_dict["update"],
