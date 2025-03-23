@@ -170,13 +170,6 @@ def send_help(chat_id, text, keyboard=None):
     )
 
 
-def test(update: Update, context: CallbackContext):
-    # pprint(eval(str(update)))
-    # update.effective_message.reply_text("Hola tester! _I_ *have* `markdown`", parse_mode=ParseMode.MARKDOWN)
-    update.effective_message.reply_text("This person edited a message")
-    print(update.effective_message)
-
-
 def start(update: Update, context: CallbackContext):
     args = context.args
     uptime = get_readable_time((time.time() - StartTime))
@@ -272,30 +265,8 @@ def error_callback(update: Update, context: CallbackContext):
     error = context.error
     try:
         raise error
-    except Unauthorized:
-        print("no nono1")
+    except:
         print(error)
-        # remove update.message.chat_id from conversation list
-    except BadRequest:
-        print("no nono2")
-        print("BadRequest caught")
-        print(error)
-
-        # handle malformed requests - read more below!
-    except TimedOut:
-        print("no nono3")
-        # handle slow connection problems
-    except NetworkError:
-        print("no nono4")
-        # handle other connection problems
-    except ChatMigrated as err:
-        print("no nono5")
-        print(err)
-        # the chat_id of a group has changed, use e.new_chat_id instead
-    except TelegramError:
-        print(error)
-        # handle all other telegram related errors
-
 
 def help_button(update: Update, context: CallbackContext):
     query = update.callback_query
@@ -303,8 +274,6 @@ def help_button(update: Update, context: CallbackContext):
     prev_match = re.match(r"help_prev\((.+?)\)", query.data)
     next_match = re.match(r"help_next\((.+?)\)", query.data)
     back_match = re.match(r"help_back", query.data)
-
-    print(query.message.chat.id)
 
     try:
         if mod_match:
@@ -629,7 +598,6 @@ def migrate_chats(update: Update, context: CallbackContext):
 
 
 def main():
-    test_handler = CommandHandler("test", test, run_async=True)
     start_handler = CommandHandler("start", start, run_async=True)
 
     help_handler = CommandHandler("help", get_help, run_async=True)
@@ -641,7 +609,6 @@ def main():
     donate_handler = CommandHandler("donate", donate, run_async=True)
     migrate_handler = MessageHandler(Filters.status_update.migrate, migrate_chats)
 
-    # dispatcher.add_handler(test_handler)
     dispatcher.add_handler(start_handler)
     dispatcher.add_handler(help_handler)
     dispatcher.add_handler(settings_handler)

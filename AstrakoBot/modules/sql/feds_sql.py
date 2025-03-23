@@ -557,11 +557,11 @@ def multi_fban_user(
 
             SESSION.add(r)
             counter += 1
-            if str(str(counter)[-2:]) == "00":
-                print(user_id)
-                print(first_name)
-                print(reason)
-                print(counter)
+            #if str(str(counter)[-2:]) == "00":
+                #print(user_id)
+                #print(first_name)
+                #print(reason)
+                #print(counter)
         try:
             SESSION.commit()
         except:
@@ -570,7 +570,7 @@ def multi_fban_user(
         finally:
             SESSION.commit()
         __load_all_feds_banned()
-        print("Done")
+        #print("Done")
         return counter
 
 
@@ -717,7 +717,7 @@ def set_fed_log(fed_id, chat_id):
         )
         SESSION.merge(fed)
         SESSION.commit()
-        print(fed_log)
+        #print(fed_log)
         return True
 
 

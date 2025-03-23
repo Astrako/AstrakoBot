@@ -357,7 +357,7 @@ def __migrate_filters():
             else:
                 file_type = Types.TEXT
 
-            print(str(x.chat_id), x.keyword, x.reply, file_type.value)
+            #print(str(x.chat_id), x.keyword, x.reply, file_type.value)
             if file_type == Types.TEXT:
                 filt = CustomFilters(
                     str(x.chat_id), x.keyword, x.reply, file_type.value, None
