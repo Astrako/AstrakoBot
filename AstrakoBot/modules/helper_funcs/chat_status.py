@@ -388,6 +388,9 @@ def user_can_ban(func):
 def connection_status(func):
     @wraps(func)
     def connected_status(update: Update, context: CallbackContext, *args, **kwargs):
+        if not update.effective_user:
+            return connected_status
+
         conn = connected(
             context.bot,
             update,
