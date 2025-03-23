@@ -77,6 +77,9 @@ VERIFIED_USER_WAITLIST = {}
 
 # do not async
 def send(update, message, keyboard, backup_message, reply_to_message=None):
+    if not message:
+        return
+
     chat = update.effective_chat
     try:
         msg = dispatcher.bot.send_message(chat.id,
@@ -195,6 +198,10 @@ def new_member(update: Update, context: CallbackContext):
     should_mute = True
     welcome_bool = True
     media_wel = False
+    keyboard = None
+    backup_message = ""
+    reply = None
+
 
     if sw is not None:
         sw_ban = sw.get_ban(new_mem.id)
@@ -327,13 +334,9 @@ def new_member(update: Update, context: CallbackContext):
                 first=escape_markdown(first_name)
             )
             keyboard = InlineKeyboardMarkup(keyb)
-
     else:
         welcome_bool = False
-        res = None
-        keyboard = None
         backup_message = None
-        reply = None
 
     # User exceptions from welcomemutes
     if (
@@ -988,7 +991,7 @@ def user_button(update: Update, context: CallbackContext):
             bot.deleteMessage(chat.id, message.message_id)
         except:
             pass
-        if member_dict["should_welc"]:
+        if member_dict["should_welc"] and welc_type:
             if member_dict["media_wel"]:
                 if welc_type == sql.Types.STICKER:
                     sent = ENUM_FUNC_MAP[member_dict["welc_type"]](
