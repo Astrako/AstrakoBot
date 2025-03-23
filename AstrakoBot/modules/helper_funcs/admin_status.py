@@ -17,9 +17,31 @@ def get_bot_member(chat_id: int) -> ChatMember:
 	try:
 		return BOT_ADMIN_CACHE[chat_id]
 	except KeyError:
-		mem = dispatcher.bot.getChatMember(chat_id, dispatcher.bot.id)
-		BOT_ADMIN_CACHE[chat_id] = mem
-		return mem
+		try:
+			mem = dispatcher.bot.getChatMember(chat_id, dispatcher.bot.id)
+			BOT_ADMIN_CACHE[chat_id] = mem
+			return mem
+		except:
+			bot_user = dispatcher.bot.get_me()
+			ghost = ChatMember(
+				user=bot_user,
+				status='member',
+				can_be_edited=False,
+				is_anonymous=False,
+				can_manage_chat=False,
+				can_delete_messages=False,
+				can_manage_video_chats=False,
+				can_restrict_members=False,
+				can_promote_members=False,
+				can_change_info=False,
+				can_invite_users=False,
+				can_post_messages=False,
+				can_edit_messages=False,
+				can_pin_messages=False,
+				can_manage_topics=False,
+				can_send_messages=False,
+			)
+			return ghost
 
 
 def user_is_admin(chat: Chat, user_id: int) -> bool:
