@@ -40,7 +40,7 @@ def tts(update: Update, context: CallbackContext):
     try:
         message.chat.send_action(ChatAction.RECORD_AUDIO)
 
-        tts = gTTS(text=text, lang='en', tld='com', timeout=60)
+        tts = gTTS(text=text, lang='en', tld='com')
         tts.save(filename)
 
         with open(filename, 'rb') as audio_file:
@@ -59,8 +59,8 @@ def tts(update: Update, context: CallbackContext):
         if cleartime:
             context.dispatcher.run_async(delete, delmsg, cleartime.time)
 
-    except:
-        message.reply_text("Failed to connect to the TTS service. Please try again later.")
+    except Exception as e:
+        message.reply_text(f"Failed to connect to the TTS service: {e}")
 
 
 TTS_HANDLER = DisableAbleCommandHandler("tts", tts, run_async=True)
