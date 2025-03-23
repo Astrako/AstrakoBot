@@ -28,7 +28,7 @@ def wiki(update: Update, context: CallbackContext):
             msg += f"Read more: https://en.wikipedia.org/wiki/{definition}"
             if len(msg) > 4000:
                 with open("result.txt", "w") as f:
-                    f.write(f"{result}\n\nUwU OwO OmO UmU")
+                    f.write(f"{res}\n\nUwU OwO OmO UmU")
                 with open("result.txt", "rb") as f:
                     delmsg = context.bot.send_document(
                         document=f,
