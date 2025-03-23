@@ -49,11 +49,6 @@ def tts(update: Update, context: CallbackContext):
                 quote=False
             )
 
-        try:
-            os.remove(filename)
-        except:
-            pass
-
         cleartime = get_clearcmd(chat.id, "tts")
 
         if cleartime:
@@ -62,6 +57,10 @@ def tts(update: Update, context: CallbackContext):
     except Exception as e:
         message.reply_text(f"Failed to connect to the TTS service: {e}")
 
+    try:
+        os.remove(filename)
+    except:
+        pass
 
 TTS_HANDLER = DisableAbleCommandHandler("tts", tts, run_async=True)
 dispatcher.add_handler(TTS_HANDLER)
