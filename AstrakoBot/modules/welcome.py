@@ -31,6 +31,7 @@ from AstrakoBot.modules.helper_funcs.string_handling import (
 from AstrakoBot.modules.log_channel import loggable
 from AstrakoBot.modules.sql.clear_cmd_sql import get_clearcmd
 from AstrakoBot.modules.sql.global_bans_sql import is_user_gbanned
+from AstrakoBot.modules.helper_funcs.admin_status import get_bot_member
 from telegram import (
     ChatPermissions,
     InlineKeyboardButton,
@@ -408,20 +409,21 @@ def new_member(update: Update, context: CallbackContext):
                     ),
                     parse_mode=ParseMode.HTML,
                 )
-                bot.restrict_chat_member(
-                    chat.id,
-                    new_mem.id,
-                    permissions=ChatPermissions(
-                        can_send_messages=False,
-                        can_invite_users=False,
-                        can_pin_messages=False,
-                        can_send_polls=False,
-                        can_change_info=False,
-                        can_send_media_messages=False,
-                        can_send_other_messages=False,
-                        can_add_web_page_previews=False,
-                    ),
-                )
+                if get_bot_member(chat.id).can_restrict_members:
+                    bot.restrict_chat_member(
+                        chat.id,
+                        new_mem.id,
+                        permissions=ChatPermissions(
+                            can_send_messages=False,
+                            can_invite_users=False,
+                            can_pin_messages=False,
+                            can_send_polls=False,
+                            can_change_info=False,
+                            can_send_media_messages=False,
+                            can_send_other_messages=False,
+                            can_add_web_page_previews=False,
+                        ),
+                    )
                 job_queue.run_once(
                     partial(check_not_bot, new_mem, chat.id, message.message_id),
                     60,
@@ -967,20 +969,21 @@ def user_button(update: Update, context: CallbackContext):
         member_dict["status"] = True
         VERIFIED_USER_WAITLIST.update({user.id: member_dict})
         query.answer(text="Yeet! You're a human, unmuted!")
-        bot.restrict_chat_member(
-            chat.id,
-            user.id,
-            permissions=ChatPermissions(
-                can_send_messages=True,
-                can_invite_users=True,
-                can_pin_messages=True,
-                can_send_polls=True,
-                can_change_info=True,
-                can_send_media_messages=True,
-                can_send_other_messages=True,
-                can_add_web_page_previews=True,
-            ),
-        )
+        if get_bot_member(chat.id).can_restrict_members:
+            bot.restrict_chat_member(
+                chat.id,
+                user.id,
+                permissions=ChatPermissions(
+                    can_send_messages=True,
+                    can_invite_users=True,
+                    can_pin_messages=True,
+                    can_send_polls=True,
+                    can_change_info=True,
+                    can_send_media_messages=True,
+                    can_send_other_messages=True,
+                    can_add_web_page_previews=True,
+                ),
+            )
         try:
             bot.deleteMessage(chat.id, message.message_id)
         except:

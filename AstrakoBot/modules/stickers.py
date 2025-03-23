@@ -143,7 +143,7 @@ def kang(update: Update, context: CallbackContext):
                 if e.message == "Stickerset_invalid":
                     last_set = True
                 else:
-                    print(e)
+                    #print(e)
                     break  # something went wrong, leave the loop and send what we have.
 
             # If we're done checking bot animated and non-animated packs
@@ -391,7 +391,7 @@ def makepack_internal(
         )
 
     except TelegramError as e:
-        print(e)
+        #print(e)
         if e.message == 'Sticker set name is already occupied':
             msg.reply_text(
                 'Your pack can be found [here](t.me/addstickers/%s)'
