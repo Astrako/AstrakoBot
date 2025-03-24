@@ -207,7 +207,7 @@ def delRepo(update: Update, context: CallbackContext):
 def listRepo(update: Update, context: CallbackContext):
     chat_id = update.effective_chat.id
     chat = update.effective_chat
-    chat_name = chat.title or chat.first or chat.username
+    chat_name = chat.title or chat.first_name or chat.username
     repo_list = sql.get_all_repos(str(chat_id))
     msg = "*List of repo shotcuts in {}:*\n"
     des = "You can get repo shortcuts by using `/fetch repo`, or `&repo`.\n"
