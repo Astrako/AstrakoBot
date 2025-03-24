@@ -171,6 +171,8 @@ def get(update: Update, context: CallbackContext, notename, show_none=True, no_f
             try:
                 setting = getprivatenotes(chat_id)
                 if note.msgtype in (sql.Types.BUTTON_TEXT, sql.Types.TEXT):
+                    text = re.sub(r'\n{3,}', '\n\n', text)
+
                     if setting:
                         bot.send_message(
                             user.id,
