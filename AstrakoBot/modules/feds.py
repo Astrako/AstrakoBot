@@ -690,22 +690,25 @@ def fed_ban(update: Update, context: CallbackContext):
         )
         # Send message to owner if fednotif is enabled
         if getfednotif:
-            bot.send_message(
-                info["owner"],
-                "<b>FedBan reason updated</b>"
-                "\n<b>Federation:</b> {}"
-                "\n<b>Federation Admin:</b> {}"
-                "\n<b>User:</b> {}"
-                "\n<b>User ID:</b> <code>{}</code>"
-                "\n<b>Reason:</b> {}".format(
-                    fed_name,
-                    mention_html(user.id, user.first_name),
-                    user_target,
-                    fban_user_id,
-                    reason,
-                ),
-                parse_mode="HTML",
-            )
+            try:
+                bot.send_message(
+                    info["owner"],
+                    "<b>FedBan reason updated</b>"
+                    "\n<b>Federation:</b> {}"
+                    "\n<b>Federation Admin:</b> {}"
+                    "\n<b>User:</b> {}"
+                    "\n<b>User ID:</b> <code>{}</code>"
+                    "\n<b>Reason:</b> {}".format(
+                        fed_name,
+                        mention_html(user.id, user.first_name),
+                        user_target,
+                        fban_user_id,
+                        reason,
+                    ),
+                    parse_mode="HTML",
+                )
+            except Unauthorized:
+                pass
 
         if message.text.startswith("/s"):
             silent = True
@@ -910,22 +913,26 @@ def fed_ban(update: Update, context: CallbackContext):
 
     # Send message to owner if fednotif is enabled
     if getfednotif:
-        bot.send_message(
-            info["owner"],
-            "<b>New FedBan</b>"
-            "\n<b>Federation:</b> {}"
-            "\n<b>Federation Admin:</b> {}"
-            "\n<b>User:</b> {}"
-            "\n<b>User ID:</b> <code>{}</code>"
-            "\n<b>Reason:</b> {}".format(
-                fed_name,
-                mention_html(user.id, user.first_name),
-                user_target,
-                fban_user_id,
-                reason,
-            ),
-            parse_mode="HTML",
-        )
+        try:
+            bot.send_message(
+                info["owner"],
+                "<b>New FedBan</b>"
+                "\n<b>Federation:</b> {}"
+                "\n<b>Federation Admin:</b> {}"
+                "\n<b>User:</b> {}"
+                "\n<b>User ID:</b> <code>{}</code>"
+                "\n<b>Reason:</b> {}".format(
+                    fed_name,
+                    mention_html(user.id, user.first_name),
+                    user_target,
+                    fban_user_id,
+                    reason,
+                ),
+                parse_mode="HTML",
+            )
+        except Unauthorized:
+            pass
+
     # If fedlog is set, then send message, except fedlog is current chat
     if get_fedlog:= sql.get_fed_log(fed_id):
         if int(get_fedlog) != int(chat.id):
@@ -1165,20 +1172,24 @@ def unfban(update: Update, context: CallbackContext):
     )
     # Send message to owner if fednotif is enabled
     if getfednotif:
-        bot.send_message(
-            info["owner"],
-            "<b>Un-FedBan</b>"
-            "\n<b>Federation:</b> {}"
-            "\n<b>Federation Admin:</b> {}"
-            "\n<b>User:</b> {}"
-            "\n<b>User ID:</b> <code>{}</code>".format(
-                info["fname"],
-                mention_html(user.id, user.first_name),
-                user_target,
-                fban_user_id,
-            ),
-            parse_mode="HTML",
-        )
+        try:
+            bot.send_message(
+                info["owner"],
+                "<b>Un-FedBan</b>"
+                "\n<b>Federation:</b> {}"
+                "\n<b>Federation Admin:</b> {}"
+                "\n<b>User:</b> {}"
+                "\n<b>User ID:</b> <code>{}</code>".format(
+                    info["fname"],
+                    mention_html(user.id, user.first_name),
+                    user_target,
+                    fban_user_id,
+                ),
+                parse_mode="HTML",
+            )
+        except Unauthorized:
+            pass
+
     # If fedlog is set, then send message, except fedlog is current chat
     get_fedlog = sql.get_fed_log(fed_id)
     if get_fedlog:
