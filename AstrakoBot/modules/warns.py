@@ -55,7 +55,7 @@ def warn(
     user: User, chat: Chat, reason: str, message: Message, warner: User = None
 ) -> str:
     if user_is_admin(chat, user.id):
-        # message.reply_text("Damn admins, They are too far to be One Punched!")
+        message.reply_text("Damn admins, They are too far to be One Punched!")
         return
 
     if user.id in WHITELIST_USERS:
