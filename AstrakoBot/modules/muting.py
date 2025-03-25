@@ -56,6 +56,7 @@ def check_user(user_id: int, bot: Bot, chat: Chat) -> Optional[str]:
 @connection_status
 @bot_admin
 @user_admin
+@can_restrict
 @loggable
 def mute(update: Update, context: CallbackContext) -> str:
     bot = context.bot
@@ -92,12 +93,6 @@ def mute(update: Update, context: CallbackContext) -> str:
 
     if member.can_send_messages is None or member.can_send_messages:
         chat_permissions = ChatPermissions(can_send_messages=False)
-        if not get_bot_member(chat.id).can_restrict_members:
-            if not silent:
-                bot.sendMessage(chat.id, "I can't restrict people here!")
-            else:
-                message.delete()
-            return log
         bot.restrict_chat_member(chat.id, user_id, chat_permissions)
         if not silent:
             reply = (
@@ -124,6 +119,7 @@ def mute(update: Update, context: CallbackContext) -> str:
 @connection_status
 @bot_admin
 @user_admin
+@can_restrict
 @loggable
 def unmute(update: Update, context: CallbackContext) -> str:
     bot, args = context.bot, context.args
@@ -158,9 +154,6 @@ def unmute(update: Update, context: CallbackContext) -> str:
         ):
             if not silent:
                 message.reply_text("This user already has the right to speak.")
-        elif not get_bot_member(chat.id).can_restrict_members:
-            if not silent:
-                bot.sendMessage(chat.id, "I can't restrict people here!")
         else:
             chat_permissions = ChatPermissions(
                 can_send_messages=True,
