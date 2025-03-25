@@ -11,6 +11,7 @@ from AstrakoBot.modules.helper_funcs.chat_status import (
     user_admin,
     user_admin_no_reply,
     can_delete,
+    is_user_ban_protected,
 )
 from AstrakoBot.modules.helper_funcs.extraction import (
     extract_text,
@@ -54,7 +55,7 @@ CURRENT_WARNING_FILTER_STRING = "<b>Current warning filters in this chat:</b>\n"
 def warn(
     user: User, chat: Chat, reason: str, message: Message, warner: User = None
 ) -> str:
-    if user_is_admin(chat, user.id):
+    if is_user_ban_protected(chat, user.id):
         message.reply_text("Damn admins, They are too far to be One Punched!")
         return
 

@@ -8,6 +8,7 @@ from AstrakoBot.modules.helper_funcs.chat_status import (
     connection_status,
     user_admin,
     can_delete,
+    is_user_ban_protected,
 )
 from AstrakoBot.modules.helper_funcs.extraction import (
     extract_user,
@@ -41,7 +42,7 @@ def check_user(user_id: int, bot: Bot, chat: Chat) -> Optional[str]:
         reply = "I'm not gonna MUTE myself, How high are you?"
         return reply
 
-    if user_is_admin(chat, user_id):
+    if is_user_ban_protected(chat, user_id):
         reply = "Can't. Find someone else to mute but not this one."
         return reply
 
