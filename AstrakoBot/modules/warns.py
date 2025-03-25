@@ -9,6 +9,7 @@ from AstrakoBot.modules.helper_funcs.chat_status import (
     bot_admin,
     can_restrict,
     user_admin,
+    user_can_ban,
     user_admin_no_reply,
     can_delete,
     is_user_ban_protected,
@@ -180,6 +181,7 @@ def button(update: Update, context: CallbackContext) -> str:
 
 
 @user_admin
+@user_can_ban
 @can_restrict
 @loggable
 def warn_user(update: Update, context: CallbackContext) -> str:
@@ -211,6 +213,7 @@ def warn_user(update: Update, context: CallbackContext) -> str:
     return ""
 
 @user_admin
+@user_can_ban
 @bot_admin
 @loggable
 def rm_last_warn(update: Update, context: CallbackContext) -> str:
@@ -236,6 +239,7 @@ def rm_last_warn(update: Update, context: CallbackContext) -> str:
     return ""
 
 @user_admin
+@user_can_ban
 @bot_admin
 @loggable
 def reset_warns(update: Update, context: CallbackContext) -> str:
@@ -292,6 +296,7 @@ def warns(update: Update, context: CallbackContext):
 
 # Dispatcher handler stop - do not async
 @user_admin
+@user_can_ban
 def add_warn_filter(update: Update, context: CallbackContext):
     chat: Optional[Chat] = update.effective_chat
     msg: Optional[Message] = update.effective_message
@@ -325,6 +330,7 @@ def add_warn_filter(update: Update, context: CallbackContext):
 
 
 @user_admin
+@user_can_ban
 def remove_warn_filter(update: Update, context: CallbackContext):
     chat: Optional[Chat] = update.effective_chat
     msg: Optional[Message] = update.effective_message
@@ -409,6 +415,7 @@ def reply_filter(update: Update, context: CallbackContext) -> str:
 
 
 @user_admin
+@user_can_ban
 @loggable
 def set_warn_limit(update: Update, context: CallbackContext) -> str:
     args = context.args
@@ -441,6 +448,7 @@ def set_warn_limit(update: Update, context: CallbackContext) -> str:
 
 
 @user_admin
+@user_can_ban
 def set_warn_strength(update: Update, context: CallbackContext):
     args = context.args
     chat: Optional[Chat] = update.effective_chat

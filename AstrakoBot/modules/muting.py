@@ -7,6 +7,7 @@ from AstrakoBot.modules.helper_funcs.chat_status import (
     can_restrict,
     connection_status,
     user_admin,
+    user_can_ban,
     can_delete,
     is_user_ban_protected,
 )
@@ -56,6 +57,7 @@ def check_user(user_id: int, bot: Bot, chat: Chat) -> Optional[str]:
 @connection_status
 @bot_admin
 @user_admin
+@user_can_ban
 @can_restrict
 @loggable
 def mute(update: Update, context: CallbackContext) -> str:
@@ -119,6 +121,7 @@ def mute(update: Update, context: CallbackContext) -> str:
 @connection_status
 @bot_admin
 @user_admin
+@user_can_ban
 @can_restrict
 @loggable
 def unmute(update: Update, context: CallbackContext) -> str:
@@ -199,6 +202,7 @@ def unmute(update: Update, context: CallbackContext) -> str:
 @bot_admin
 @can_restrict
 @user_admin
+@user_can_ban
 @loggable
 def temp_mute(update: Update, context: CallbackContext) -> str:
     bot, args = context.bot, context.args
