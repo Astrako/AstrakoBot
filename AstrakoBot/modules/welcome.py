@@ -993,7 +993,7 @@ def user_button(update: Update, context: CallbackContext):
             pass
         if member_dict["should_welc"]:
             if member_dict["media_wel"]:
-                if welc_type == sql.Types.STICKER:
+                if member_dict["welc_type"] == sql.Types.STICKER:
                     sent = ENUM_FUNC_MAP[member_dict["welc_type"]](
                         member_dict["chat_id"],
                         member_dict["cust_content"],
