@@ -1,5 +1,6 @@
 from PIL import Image, ImageDraw, ImageFont, ImageOps
 from telethon.tl import types, functions
+from telethon.errors.rpcerrorlist import UserNotParticipantError
 from fontTools.ttLib import TTFont
 from fontTools.unicode import Unicode
 import emoji
@@ -90,6 +91,8 @@ async def process(msg, user, client, reply, replied=None):
             title = details.participant.rank if details.participant.rank else "Creator"
         elif isinstance(details.participant, types.ChannelParticipantAdmin):
             title = details.participant.rank if details.participant.rank else "Admin"
+    except UserNotParticipantError:
+        pass
     except TypeError:
         pass
     titlewidth = font2.getsize(title)[0]
