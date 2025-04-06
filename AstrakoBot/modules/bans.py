@@ -123,7 +123,7 @@ def ban(update: Update, context: CallbackContext) -> str:
         return log
 
     except BadRequest as excp:
-        if excp.message == "Reply message not found":
+        if excp.message == "Reply message not found" or excp.message == "Message can't be deleted":
             # Do not reply
             if silent:
                 return log
