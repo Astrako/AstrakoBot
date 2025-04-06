@@ -116,13 +116,16 @@ if is_module_loaded(FILENAME):
 
         log_channel = sql.get_chat_log_channel(chat.id)
         if log_channel:
-            log_channel_info = bot.get_chat(log_channel)
-            message.reply_text(
-                f"This group has all it's logs sent to:"
-                f" {escape_markdown(log_channel_info.title)} (`{log_channel}`)",
-                parse_mode=ParseMode.MARKDOWN,
-            )
-
+            try:
+                log_channel_info = bot.get_chat(log_channel)
+                message.reply_text(
+                    f"This group has all it's logs sent to:"
+                    f" {escape_markdown(log_channel_info.title)} (`{log_channel}`)",
+                    parse_mode=ParseMode.MARKDOWN,
+                )
+            except Unauthorized:
+                sql.stop_chat_logging(chat.id)
+                message.reply_text("No log channel has been set for this group!")
         else:
             message.reply_text("No log channel has been set for this group!")
 
