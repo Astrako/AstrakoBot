@@ -629,6 +629,22 @@ def left_member(update: Update, context: CallbackContext):
             deletion(update, context, delmsg)
 
 
+def get_welcome_kwargs(welcome_type, chat, welcome_m, keyboard):
+    kwargs = {
+        'reply_markup': keyboard,
+    }
+
+    # Add caption (except for stickers)
+    if welcome_type != sql.Types.STICKER:
+        kwargs['caption'] = welcome_m
+        kwargs['parse_mode'] = ParseMode.MARKDOWN
+
+    # Add web preview disable (only for supported types)
+    if welcome_type in {sql.Types.TEXT, sql.Types.PHOTO}:
+        kwargs['disable_web_page_preview'] = True
+
+    return kwargs
+
 @user_admin
 def welcome(update: Update, context: CallbackContext):
     args = context.args
@@ -657,20 +673,17 @@ def welcome(update: Update, context: CallbackContext):
         else:
             buttons = sql.get_welc_buttons(chat.id)
             if noformat:
-                welcome_m += revert_buttons(buttons)
-                ENUM_FUNC_MAP[welcome_type](chat.id, cust_content, caption=welcome_m)
+                if welcome_m:
+                    welcome_m += revert_buttons(buttons)
+                    ENUM_FUNC_MAP[welcome_type](chat.id, cust_content, caption=welcome_m)
+                else:
+                    ENUM_FUNC_MAP[welcome_type](chat.id, cust_content)
 
             else:
                 keyb = build_keyboard(buttons)
                 keyboard = InlineKeyboardMarkup(keyb)
-                ENUM_FUNC_MAP[welcome_type](
-                    chat.id,
-                    cust_content,
-                    caption=welcome_m,
-                    reply_markup=keyboard,
-                    parse_mode=ParseMode.MARKDOWN,
-                    disable_web_page_preview=True,
-                )
+                kwargs = get_welcome_kwargs(welcome_type, chat, welcome_m, keyboard)
+                ENUM_FUNC_MAP[welcome_type](chat.id, cust_content, **kwargs)
 
     elif len(args) >= 1:
         if args[0].lower() in ("on", "yes"):
