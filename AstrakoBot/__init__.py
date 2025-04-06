@@ -17,7 +17,10 @@ logging.basicConfig(
 )
 
 LOGGER = logging.getLogger(__name__)
-logging.getLogger("telethon.client.updates").setLevel(logging.WARNING)
+log_warning_only = ["telethon.client.updates", "apscheduler.scheduler", "apscheduler.executors.default", "telethon.network.mtprotosender", "telethon.client"]
+
+for i in log_warning_only:
+    logging.getLogger(i).setLevel(logging.WARNING)
 
 # if version < 3.6, stop bot.
 if sys.version_info[0] < 3 or sys.version_info[1] < 6:
