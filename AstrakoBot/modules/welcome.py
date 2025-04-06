@@ -143,7 +143,7 @@ def send(update, message, keyboard, backup_message, reply_to_message=None):
             LOGGER.warning(message)
             LOGGER.warning(keyboard)
             LOGGER.exception("Could not parse! got invalid url host errors")
-        elif excp.message == "Have no rights to send a message":
+        elif excp.message == "Have no rights to send a message" or excp.message == "Topic_closed":
             return
         else:
             msg = dispatcher.bot.send_message(chat.id,
