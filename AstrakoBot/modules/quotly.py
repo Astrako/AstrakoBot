@@ -27,29 +27,6 @@ COLORS = [
 
 
 async def process(msg, user, client, reply, replied=None):
-    if not os.path.isdir("resources"):
-        os.mkdir("resources", 0o755)
-        urllib.request.urlretrieve(
-            "https://github.com/erenmetesar/modules-repo/raw/master/Roboto-Regular.ttf",
-            "resources/Roboto-Regular.ttf",
-        )
-        urllib.request.urlretrieve(
-            "https://github.com/erenmetesar/modules-repo/raw/master/Quivira.otf",
-            "resources/Quivira.otf",
-        )
-        urllib.request.urlretrieve(
-            "https://github.com/erenmetesar/modules-repo/raw/master/Roboto-Medium.ttf",
-            "resources/Roboto-Medium.ttf",
-        )
-        urllib.request.urlretrieve(
-            "https://github.com/erenmetesar/modules-repo/raw/master/DroidSansMono.ttf",
-            "resources/DroidSansMono.ttf",
-        )
-        urllib.request.urlretrieve(
-            "https://github.com/erenmetesar/modules-repo/raw/master/Roboto-Italic.ttf",
-            "resources/Roboto-Italic.ttf",
-        )
-
     # Importing fonts and gettings the size of text
     font = ImageFont.truetype("resources/Roboto-Medium.ttf", 43, encoding="utf-16")
     font2 = ImageFont.truetype("resources/Roboto-Regular.ttf", 33, encoding="utf-16")
@@ -98,8 +75,13 @@ async def process(msg, user, client, reply, replied=None):
     titlewidth = font2.getsize(title)[0]
 
     # Get user name
-    lname = "" if not user.last_name else user.last_name
-    tot = user.first_name + " " + lname
+    tot = (
+        f"{user.first_name} {user.last_name}" if (user.first_name and user.last_name) else
+        user.first_name or
+        getattr(user, 'title', '') or
+        getattr(user, 'username', '') or
+        "Bot"
+    )
 
     namewidth = fallback.getsize(tot)[0] + 10
 
@@ -147,7 +129,9 @@ async def process(msg, user, client, reply, replied=None):
     if replied:
         # Creating a big canvas to gather all the elements
         reptot = (
-            replied.sender.first_name or
+            f"{replied.sender.first_name} {replied.sender.last_name}".strip()
+            if getattr(replied.sender, 'last_name', None)
+            else replied.sender.first_name or
             getattr(replied.sender, 'title', '') or
             getattr(replied.sender, 'username', '') or
             "Bot"
