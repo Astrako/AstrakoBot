@@ -84,7 +84,7 @@ def list_handlers(update: Update, context: CallbackContext):
         if len(entry) + len(filter_list) > telegram.MAX_MESSAGE_LENGTH:
             deletion(update, context, send_message(
                 update.effective_message,
-                filter_list.format(chat_name),
+                filter_list.replace("{}", chat_name, 1),
                 parse_mode=telegram.ParseMode.MARKDOWN,
             ))
             filter_list = entry
@@ -93,7 +93,7 @@ def list_handlers(update: Update, context: CallbackContext):
 
     deletion(update, context, send_message(
         update.effective_message,
-        filter_list.format(chat_name),
+        filter_list.replace("{}", chat_name, 1),
         parse_mode=telegram.ParseMode.MARKDOWN,
     ))
 
