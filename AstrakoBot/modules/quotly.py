@@ -143,8 +143,12 @@ async def process(msg, user, client, reply, replied=None):
     y = 80
     if replied:
         # Creating a big canvas to gather all the elements
-        replname = "" if not replied.sender.last_name else replied.sender.last_name
-        reptot = replied.sender.first_name + " " + replname
+        reptot = (
+            replied.sender.first_name or
+            getattr(replied.sender, 'title', '') or
+            getattr(replied.sender, 'username', '') or
+            "Bot"
+        )
         replywidth = font2.getsize(reptot)[0]
         if reply.sticker:
             sticker = await reply.download_media()
@@ -430,6 +434,7 @@ async def quotly(event):
         return
     reply = await event.get_reply_message()
     if reply is None:
+        await event.reply("What to quote?")
         return
     msg = reply.message
     repliedreply = await reply.get_reply_message()
