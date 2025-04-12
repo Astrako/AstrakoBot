@@ -6,6 +6,7 @@ import re
 import time
 import uuid
 from io import BytesIO
+from html import escape
 
 import AstrakoBot.modules.sql.feds_sql as sql
 from AstrakoBot import (
@@ -520,9 +521,10 @@ def fed_admin(update: Update, context: CallbackContext):
         owner_name = owner.first_name + " " + owner.last_name
     except BaseException:
         owner_name = owner.first_name or 'Deleted'
-    text += " • {}\n".format(mention_html(owner.id, owner_name))
+    text += " • {} (<code>{}</code>)\n".format(mention_html(owner.id, owner_name), escape(str(owner.id)))
 
     members = sql.all_fed_members(fed_id)
+    zombies = []
     if len(members) == 0:
         text += "\n🔱 There are no admins in this federation"
     else:
@@ -530,11 +532,18 @@ def fed_admin(update: Update, context: CallbackContext):
         for x in members:
             try:
                 user = bot.get_chat(x)
-            except BadRequest as excp:
-                if excp.message in FBAN_ERRORS:
-                    pass
-            name = user.first_name or 'Deleted'
-            text += " • {}\n".format(mention_html(user.id, user.first_name))
+            except BadRequest:
+                continue
+
+            if not user.first_name:
+                zombies.append(user.id)
+                continue
+            text += " • {} (<code>{}</code>)\n".format(mention_html(user.id, user.first_name), escape(str(user.id)))
+
+        if zombies:
+            text += "\n🧟 Zombies:\n"
+            for user_id in zombies:
+                text += " • <code>{}</code>\n".format(escape(str(user_id)))
 
     update.effective_message.reply_text(text, parse_mode=ParseMode.HTML)
 
