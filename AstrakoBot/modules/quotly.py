@@ -415,7 +415,7 @@ async def replied_user(draw, tot, text, maxlength, title):
             space += textfont.getsize(letter)[0]
 
 
-@telethn.on(events.NewMessage(pattern="^[!/](quotly|q)$"))
+@telethn.on(events.NewMessage(pattern="^[!/]quotly$"))
 async def quotly(event):
     if event.fwd_from:
         return
