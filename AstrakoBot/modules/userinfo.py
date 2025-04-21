@@ -6,13 +6,20 @@ import requests
 from telegram.user import User
 from telethon.tl.functions.channels import GetFullChannelRequest
 from telethon.tl.types import ChannelParticipantsAdmins
-from telethon import events
+from telethon import events, types
 
 from telegram import MAX_MESSAGE_LENGTH, ParseMode, Update, MessageEntity
 from telegram.ext import CallbackContext, CommandHandler, Filters
 from telegram.ext.dispatcher import run_async
 from telegram.error import BadRequest
 from telegram.utils.helpers import escape_markdown, mention_html
+from telethon.errors import (
+    ChannelInvalidError,
+    ChannelPrivateError,
+    ChatAdminRequiredError,
+    PeerIdInvalidError,
+    UserNotParticipantError,
+)
 
 from AstrakoBot import (
     DEV_USERS,
@@ -87,37 +94,130 @@ def get_id(update: Update, context: CallbackContext):
     events.NewMessage(pattern="/ginfo ", from_users=(SUDO_USERS or []) + (SUPPORT_USERS or []))
 )
 async def group_info(event) -> None:
-    chat = event.text.split(" ", 1)[1]
+    target_entity = None
+    entity_id_str = None
+
+    if event.is_reply:
+        replied_msg = await event.get_reply_message()
+        if replied_msg and replied_msg.sender_id:
+            target_entity = replied_msg.sender_id
+            entity_id_str = str(target_entity)
+        else:
+            await event.reply("Could not identify the user from the replied message.")
+            return
+    else:
+        parts = event.text.split(" ", 1)
+        if len(parts) > 1:
+            entity_id_str = parts[1].strip()
+            if entity_id_str.startswith('@'):
+                target_entity = entity_id_str
+            else:
+                try:
+                    target_entity = int(entity_id_str)
+                except ValueError:
+                    await event.reply("Invalid ID or username format.")
+                    return
+        else:
+            target_entity = event.chat_id
+            entity_id_str = str(target_entity)
+
+    if target_entity is None:
+        await event.reply("Could not determine the target entity.")
+        return
+
     try:
-        entity = await event.client.get_entity(chat)
-        totallist = await event.client.get_participants(
-            entity, filter=ChannelParticipantsAdmins
-        )
-        ch_full = await event.client(GetFullChannelRequest(channel=entity))
-    except:
+        entity = await event.client.get_entity(target_entity)
+    except (ValueError, PeerIdInvalidError, ChannelInvalidError, ChannelPrivateError) as e:
         await event.reply(
-            "Can't for some reason, maybe it is a private one or that I am banned there."
+            f"Could not find or access the specified chat/channel (`{entity_id_str}`). "
+            "It might be invalid, private, or I might lack permissions."
         )
         return
-    msg = f"**ID**: `{entity.id}`"
-    msg += f"\n**Title**: `{entity.title}`"
-    msg += f"\n**Datacenter**: `{entity.photo.dc_id}`"
-    msg += f"\n**Video PFP**: `{entity.photo.has_video}`"
-    msg += f"\n**Supergroup**: `{entity.megagroup}`"
-    msg += f"\n**Restricted**: `{entity.restricted}`"
-    msg += f"\n**Scam**: `{entity.scam}`"
-    msg += f"\n**Slowmode**: `{entity.slowmode_enabled}`"
-    if entity.username:
-        msg += f"\n**Username**: {entity.username}"
-    msg += "\n\n**Member Stats:**"
-    msg += f"\n`Admins:` `{len(totallist)}`"
-    msg += f"\n`Users`: `{totallist.total}`"
-    msg += "\n\n**Admins List:**"
-    for x in totallist:
-        msg += f"\n• [{x.id}](tg://user?id={x.id})"
-    msg += f"\n\n**Description**:\n`{ch_full.full_chat.about}`"
-    await event.reply(msg)
+    except Exception as e:
+        await event.reply(f"An unexpected error occurred while fetching info for `{entity_id_str}`.")
+        return
 
+    msg = f"**Info for:** `{entity_id_str}`\n"
+    msg += f"**Type:** `{type(entity).__name__}`\n"
+    msg += f"**ID:** `{entity.id}`\n"
+
+    if isinstance(entity, (types.Chat, types.Channel)):
+        msg += f"**Title:** `{entity.title}`\n"
+        if hasattr(entity, 'username') and entity.username:
+            msg += f"**Username:** @{entity.username}\n"
+        else:
+            msg += f"**Username:** `None`\n"
+
+        if hasattr(entity.photo, 'dc_id'):
+            msg += f"**Photo DC:** `{entity.photo.dc_id}`\n"
+        if hasattr(entity.photo, 'has_video'):
+            msg += f"**Video PFP:** `{entity.photo.has_video}`\n"
+
+        msg += f"**Scam:** `{getattr(entity, 'scam', 'N/A')}`\n"
+        msg += f"**Restricted:** `{getattr(entity, 'restricted', 'N/A')}`\n"
+        if getattr(entity, 'restriction_reason', None):
+             msg += f"**Restriction Reason:** `{entity.restriction_reason}`\n"
+
+        if isinstance(entity, types.Channel):
+            msg += f"**Supergroup:** `{entity.megagroup}`\n"
+            msg += f"**Broadcast Channel:** `{entity.broadcast}`\n"
+            msg += f"**Verified:** `{entity.verified}`\n"
+            msg += f"**Gigagroup:** `{getattr(entity, 'gigagroup', 'N/A')}`\n"
+            msg += f"**Slowmode Enabled:** `{entity.slowmode_enabled}`\n"
+
+        full_chat_info = None
+        admin_list = []
+        participant_count = "N/A"
+        admin_count = "N/A"
+        about = "N/A"
+
+        try:
+            if isinstance(entity, types.Channel):
+                full_chat_info = await event.client(GetFullChannelRequest(channel=entity))
+                about = full_chat_info.full_chat.about
+                participant_count = getattr(full_chat_info.full_chat, 'participants_count', 'N/A')
+            elif isinstance(entity, types.Chat):
+                full_chat_info = await event.client(GetFullChatRequest(chat_id=entity.id))
+                about = getattr(full_chat_info.full_chat, 'about', 'N/A')
+                if hasattr(full_chat_info, 'users'):
+                     participant_count = len(full_chat_info.users)
+
+            try:
+                admins = await event.client.get_participants(
+                    entity, filter=ChannelParticipantsAdmins
+                )
+                admin_count = len(admins) if admins else 0 # Handle None case
+                admin_list = [f"• [{admin.id}](tg://user?id={admin.id})" for admin in admins]
+            except ChatAdminRequiredError:
+                admin_list.append("_(Admin permissions required to list)_")
+                admin_count = "N/A (No Perms)"
+            except UserNotParticipantError:
+                admin_list.append("_(Bot is not in this chat/channel)_")
+                admin_count = "N/A (Not Participant)"
+            except Exception as e:
+                admin_list.append("_(Could not retrieve admin list)_")
+                admin_count = "N/A (Error)"
+
+
+            msg += "\n**Stats:**\n"
+            msg += f"`Participants:` `{participant_count}`\n"
+            msg += f"`Admins:` `{admin_count}`\n"
+
+            if admin_list:
+                msg += "\n**Admins List:**"
+                msg += "\n" + "\n".join(admin_list) # Join list items with newlines
+
+            msg += f"\n\n**Description:**\n`{about}`"
+
+        except (ChatAdminRequiredError, UserNotParticipantError) as e:
+             msg += "\n\n**(Could not retrieve full details like description or participant counts due to permissions or bot not being a participant)**"
+        except Exception as e:
+             msg += "\n\n**(An error occurred while retrieving full details)**"
+
+    else:
+        msg += "\n**(Unsupported entity type)**"
+
+    await event.reply(msg, link_preview=False)
 
 def gifid(update: Update, context: CallbackContext):
     msg = update.effective_message
