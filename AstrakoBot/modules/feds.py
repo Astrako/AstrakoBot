@@ -128,7 +128,7 @@ def new_fed(update: Update, context: CallbackContext):
         try:
             bot.send_message(
                 EVENT_LOGS,
-                "New Federation: <b>{}</b>\nID: <pre>{}</pre>".format(fed_name, fed_id),
+                "New Federation: <b>{}</b>\nID: <pre>{}</pre>".format(escape(str(fed_name)), fed_id),
                 parse_mode=ParseMode.HTML,
             )
         except:
@@ -689,7 +689,7 @@ def fed_ban(update: Update, context: CallbackContext):
             "\n<b>User:</b> {}"
             "\n<b>User ID:</b> <code>{}</code>"
             "\n<b>Reason:</b> {}".format(
-                fed_name,
+                escape(str(fed_name)),
                 mention_html(user.id, user.first_name),
                 user_target,
                 fban_user_id,
@@ -708,7 +708,7 @@ def fed_ban(update: Update, context: CallbackContext):
                     "\n<b>User:</b> {}"
                     "\n<b>User ID:</b> <code>{}</code>"
                     "\n<b>Reason:</b> {}".format(
-                        fed_name,
+                        escape(str(fed_name)),
                         mention_html(user.id, user.first_name),
                         user_target,
                         fban_user_id,
@@ -735,7 +735,7 @@ def fed_ban(update: Update, context: CallbackContext):
                     "\n<b>User:</b> {}"
                     "\n<b>User ID:</b> <code>{}</code>"
                     "\n<b>Reason:</b> {}".format(
-                        fed_name,
+                        escape(str(fed_name)),
                         mention_html(user.id, user.first_name),
                         user_target,
                         fban_user_id,
@@ -762,7 +762,7 @@ def fed_ban(update: Update, context: CallbackContext):
 							 "\n<b>Federation Admin:</b> {}" \
 							 "\n<b>User:</b> {}" \
 							 "\n<b>User ID:</b> <code>{}</code>" \
-							 "\n<b>Reason:</b> {}".format(fed_name, mention_html(user.id, user.first_name), user_target, fban_user_id, reason), parse_mode="HTML")
+							 "\n<b>Reason:</b> {}".format(escape(str(fed_name)), mention_html(user.id, user.first_name), user_target, fban_user_id, reason), parse_mode="HTML")
 				"""
                 bot.ban_chat_member(fedschat, fban_user_id)
             except BadRequest as excp:
@@ -805,7 +805,7 @@ def fed_ban(update: Update, context: CallbackContext):
 							 "\n<b>Federation Admin:</b> {}" \
 							 "\n<b>User:</b> {}" \
 							 "\n<b>User ID:</b> <code>{}</code>" \
-							 "\n<b>Reason:</b> {}".format(fed_name, mention_html(user.id, user.first_name), user_target, fban_user_id, reason), 
+							 "\n<b>Reason:</b> {}".format(escape(str(fed_name)), mention_html(user.id, user.first_name), user_target, fban_user_id, reason), 
 							html=True)
 		"""
 
@@ -906,7 +906,7 @@ def fed_ban(update: Update, context: CallbackContext):
         "\n<b>User:</b> {}"
         "\n<b>User ID:</b> <code>{}</code>"
         "\n<b>Reason:</b> {}".format(
-            fed_name,
+            escape(str(fed_name)),
             mention_html(user.id, user.first_name),
             user_target,
             fban_user_id,
@@ -931,7 +931,7 @@ def fed_ban(update: Update, context: CallbackContext):
                 "\n<b>User:</b> {}"
                 "\n<b>User ID:</b> <code>{}</code>"
                 "\n<b>Reason:</b> {}".format(
-                    fed_name,
+                    escape(str(fed_name)),
                     mention_html(user.id, user.first_name),
                     user_target,
                     fban_user_id,
@@ -953,7 +953,7 @@ def fed_ban(update: Update, context: CallbackContext):
                 "\n<b>User:</b> {}"
                 "\n<b>User ID:</b> <code>{}</code>"
                 "\n<b>Reason:</b> {}".format(
-                    fed_name,
+                    escape(str(fed_name)),
                     mention_html(user.id, user.first_name),
                     user_target,
                     fban_user_id,
@@ -982,7 +982,7 @@ def fed_ban(update: Update, context: CallbackContext):
 							"\n<b>Federation Admin:</b> {}" \
 							"\n<b>User:</b> {}" \
 							"\n<b>User ID:</b> <code>{}</code>" \
-							"\n<b>Reason:</b> {}".format(fed_name, mention_html(user.id, user.first_name), user_target, fban_user_id, reason), parse_mode="HTML")
+							"\n<b>Reason:</b> {}".format(escape(str(fed_name)), mention_html(user.id, user.first_name), user_target, fban_user_id, reason), parse_mode="HTML")
 			"""
             bot.ban_chat_member(fedschat, fban_user_id)
         except BadRequest as excp:
@@ -1018,7 +1018,7 @@ def fed_ban(update: Update, context: CallbackContext):
 							 "\n<b>Federation Admin:</b> {}" \
 							 "\n<b>User:</b> {}" \
 							 "\n<b>User ID:</b> <code>{}</code>" \
-							 "\n<b>Reason:</b> {}".format(fed_name, mention_html(user.id, user.first_name), user_target, fban_user_id, reason), 
+							 "\n<b>Reason:</b> {}".format(escape(str(fed_name)), mention_html(user.id, user.first_name), user_target, fban_user_id, reason), 
 							html=True)
 		"""
 
