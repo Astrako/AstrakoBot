@@ -228,7 +228,7 @@ def fed_chat(update: Update, context: CallbackContext):
     info = sql.get_fed_info(fed_id)
 
     text = "This group is part of the following federation:"
-    text += "\n{} (ID: <code>{}</code>)".format(info["fname"], fed_id)
+    text += "\n{} (ID: <code>{}</code>)".format(escape(str(info["fname"])), fed_id)
 
     update.effective_message.reply_text(text, parse_mode=ParseMode.HTML)
 
@@ -475,7 +475,7 @@ def fed_info(update: Update, context: CallbackContext):
 
     text = "<b>ℹ️ Federation Information:</b>"
     text += "\nFedID: <code>{}</code>".format(fed_id)
-    text += "\nName: {}".format(info["fname"])
+    text += "\nName: {}".format(escape(str(info["fname"])))
     text += "\nCreator: {}".format(mention_html(owner.id, owner_name))
     text += "\nAll Admins: <code>{}</code>".format(TotalAdminFed)
     getfban = sql.get_all_fban_users(fed_id)
@@ -514,7 +514,7 @@ def fed_admin(update: Update, context: CallbackContext):
     chat = update.effective_chat
     info = sql.get_fed_info(fed_id)
 
-    text = "<b>Federation Admin {}:</b>\n\n".format(info["fname"])
+    text = "<b>Federation Admin {}:</b>\n\n".format(escape(str(info["fname"])))
     text += "👑 Owner:\n"
     owner = bot.get_chat(info["owner"])
     try:
@@ -1172,7 +1172,7 @@ def unfban(update: Update, context: CallbackContext):
         "\n<b>Federation Admin:</b> {}"
         "\n<b>User:</b> {}"
         "\n<b>User ID:</b> <code>{}</code>".format(
-            info["fname"],
+            escape(str(info["fname"])),
             mention_html(user.id, user.first_name),
             user_target,
             fban_user_id,
@@ -1189,7 +1189,7 @@ def unfban(update: Update, context: CallbackContext):
                 "\n<b>Federation Admin:</b> {}"
                 "\n<b>User:</b> {}"
                 "\n<b>User ID:</b> <code>{}</code>".format(
-                    info["fname"],
+                    escape(str(info["fname"])),
                     mention_html(user.id, user.first_name),
                     user_target,
                     fban_user_id,
@@ -1210,7 +1210,7 @@ def unfban(update: Update, context: CallbackContext):
                 "\n<b>Federation Admin:</b> {}"
                 "\n<b>User:</b> {}"
                 "\n<b>User ID:</b> <code>{}</code>".format(
-                    info["fname"],
+                    escape(str(info["fname"])),
                     mention_html(user.id, user.first_name),
                     user_target,
                     fban_user_id,
@@ -1484,7 +1484,7 @@ def fed_ban_list(update: Update, context: CallbackContext):
     getfban = sql.get_all_fban_users(fed_id)
     if len(getfban) == 0:
         update.effective_message.reply_text(
-            "The federation ban list of {} is empty".format(info["fname"]),
+            "The federation ban list of {} is empty".format(escape(str(info["fname"]))),
             parse_mode=ParseMode.HTML,
         )
         return
@@ -1581,13 +1581,13 @@ def fed_ban_list(update: Update, context: CallbackContext):
             return
 
     text = "<b>{} users have been banned from the federation {}:</b>\n".format(
-        len(getfban), info["fname"]
+        len(getfban), escape(str(info["fname"]))
     )
     for users in getfban:
         getuserinfo = sql.get_all_fban_users_target(fed_id, users)
         if getuserinfo is False:
             text = "There are no users banned from the federation {}".format(
-                info["fname"]
+                escape(str(info["fname"]))
             )
             break
         user_name = getuserinfo["first_name"]
@@ -1697,12 +1697,12 @@ def fed_chats(update: Update, context: CallbackContext):
     getlist = sql.all_fed_chats(fed_id)
     if len(getlist) == 0:
         update.effective_message.reply_text(
-            "No users are fbanned from the federation {}".format(info["fname"]),
+            "No users are fbanned from the federation {}".format(escape(str(info["fname"]))),
             parse_mode=ParseMode.HTML,
         )
         return
 
-    text = "<b>New chat joined the federation {}:</b>\n".format(info["fname"])
+    text = "<b>New chat joined the federation {}:</b>\n".format(escape(str(info["fname"])))
     for chats in getlist:
         try:
             chat_name = dispatcher.bot.getChat(chats).title
