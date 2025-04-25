@@ -110,11 +110,6 @@ def dev_plus(func):
                 update.effective_message.delete()
             except:
                 pass
-        else:
-            update.effective_message.reply_text(
-                "This is a developer restricted command."
-                " You do not have permissions to run this."
-            )
 
     return is_dev_plus_func
 
@@ -147,10 +142,6 @@ def sudo_plus(func):
                 update.effective_message.delete()
             except:
                 pass
-        else:
-            update.effective_message.reply_text(
-                "Who dis non-admin telling me what to do? You want a punch?"
-            )
 
     return is_sudo_plus_func
 
