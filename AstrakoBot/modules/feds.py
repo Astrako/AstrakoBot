@@ -457,10 +457,6 @@ def fed_info(update: Update, context: CallbackContext):
             return
         info = sql.get_fed_info(fed_id)
 
-    if is_user_fed_admin(fed_id, user.id) is False:
-        update.effective_message.reply_text("Only a federation admin can do this!")
-        return
-
     owner = bot.get_chat(info["owner"])
     try:
         owner_name = owner.first_name + " " + owner.last_name
