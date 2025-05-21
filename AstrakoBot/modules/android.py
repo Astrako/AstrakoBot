@@ -7,7 +7,7 @@ from datetime import datetime
 from bs4 import BeautifulSoup
 from requests import get
 from telegram import Bot, Update, ParseMode, InlineKeyboardMarkup, InlineKeyboardButton
-from telegram.ext import Updater, CommandHandler, MessageHandler
+from telegram.ext import Updater, MessageHandler
 from telegram.ext import CallbackContext, run_async
 from ujson import loads
 from yaml import load, Loader
@@ -16,6 +16,7 @@ from AstrakoBot import dispatcher
 from AstrakoBot.modules.sql.clear_cmd_sql import get_clearcmd
 from AstrakoBot.modules.github import getphh
 from AstrakoBot.modules.helper_funcs.misc import delete
+from AstrakoBot.modules.disable import DisableAbleCommandHandler
 
 rget_headers = {
     "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/93.0.4577.63 Safari/537.36"
@@ -378,14 +379,14 @@ __help__ = """
 • `/getfw <model> <csc>` - Samsung only - gets firmware download links from samfrew, sammobile and sfirmwares for the given device
 """
 
-MAGISK_HANDLER = CommandHandler(["magisk", "root", "su"], magisk, run_async=True)
-KERNELSU_HANDLER = CommandHandler("kernelsu", kernelsu, run_async=True)
-ORANGEFOX_HANDLER = CommandHandler("orangefox", orangefox, run_async=True)
-TWRP_HANDLER = CommandHandler("twrp", twrp, run_async=True)
-GETFW_HANDLER = CommandHandler("getfw", getfw, run_async=True)
-CHECKFW_HANDLER = CommandHandler("checkfw", checkfw, run_async=True)
-PHH_HANDLER = CommandHandler("phh", phh, run_async=True)
-MIUI_HANDLER = CommandHandler("miui", miui, run_async=True)
+MAGISK_HANDLER = DisableAbleCommandHandler(["magisk", "root", "su"], magisk, run_async=True)
+KERNELSU_HANDLER = DisableAbleCommandHandler("kernelsu", kernelsu, run_async=True)
+ORANGEFOX_HANDLER = DisableAbleCommandHandler("orangefox", orangefox, run_async=True)
+TWRP_HANDLER = DisableAbleCommandHandler("twrp", twrp, run_async=True)
+GETFW_HANDLER = DisableAbleCommandHandler("getfw", getfw, run_async=True)
+CHECKFW_HANDLER = DisableAbleCommandHandler("checkfw", checkfw, run_async=True)
+PHH_HANDLER = DisableAbleCommandHandler("phh", phh, run_async=True)
+MIUI_HANDLER = DisableAbleCommandHandler("miui", miui, run_async=True)
 
 dispatcher.add_handler(MAGISK_HANDLER)
 dispatcher.add_handler(KERNELSU_HANDLER)
