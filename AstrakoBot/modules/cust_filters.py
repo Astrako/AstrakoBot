@@ -300,6 +300,7 @@ def reply_filter(update: Update, context: CallbackContext):
                     "id",
                     "chatname",
                     "mention",
+                    "replytag"
                 ]
                 if filt.reply_text:
                     if "%%%" in filt.reply_text:
@@ -362,6 +363,7 @@ def reply_filter(update: Update, context: CallbackContext):
                             if message.chat.type != "private"
                             else escape(message.from_user.first_name),
                             id=message.from_user.id,
+                            replytag=message.reply_to_message.from_user.id
                         )
                     else:
                         filtext = ""
